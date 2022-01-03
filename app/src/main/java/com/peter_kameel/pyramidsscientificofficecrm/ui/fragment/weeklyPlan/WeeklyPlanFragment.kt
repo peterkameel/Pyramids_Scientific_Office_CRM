@@ -18,6 +18,7 @@ import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanRecyclerModel
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.daily_visit.view.WeeklyPlan_Date_Button
@@ -108,7 +109,7 @@ class WeeklyPlanFragment : Fragment() {
         //save hospital
         view.Weekly_Plan_Save_Hospital.setOnClickListener {
             if (view.Weekly_Plan_Hospital_text.text.isNullOrEmpty()) {
-                Toast.makeText(context, SharedTag.hospital, Toast.LENGTH_LONG).show()
+                Toast.makeText(context,Massages.hospital, Toast.LENGTH_LONG).show()
             } else {
                 viewModel.getSingleHospital(view.Weekly_Plan_Hospital_text.text.toString(), uid)
             }
@@ -125,7 +126,7 @@ class WeeklyPlanFragment : Fragment() {
         //save doctor
         view.Weekly_Plan_Save_Doctor.setOnClickListener {
             if (view.Weekly_Plan_doctor.text.isNullOrEmpty()) {
-                Toast.makeText(context, SharedTag.doctor, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, Massages.doctor, Toast.LENGTH_LONG).show()
             } else {
                 viewModel.getSingleDoctor(view.Weekly_Plan_doctor.text.toString(), uid)
             }
@@ -143,18 +144,18 @@ class WeeklyPlanFragment : Fragment() {
         view.Weekly_Plan_Save_Plan_Date.setOnClickListener {
             when {
                 visitDate.isNullOrEmpty() -> {
-                    Toast.makeText(context, SharedTag.date, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, Massages.date, Toast.LENGTH_LONG).show()
                 }
                 hospitalList.isNullOrEmpty() -> {
-                    Toast.makeText(context, SharedTag.hospital, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, Massages.hospital, Toast.LENGTH_LONG).show()
                 }
                 doctorList.isNullOrEmpty() -> {
-                    Toast.makeText(context, SharedTag.doctor, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, Massages.doctor, Toast.LENGTH_LONG).show()
                 }
                 else -> {
                     val plan = WeeklyPlanModel(hospitalList, doctorList)
                     viewModel.createPlan(visitDate.toString(), plan, uid)
-                    Toast.makeText(context, SharedTag.addPlan, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, Massages.addPlan, Toast.LENGTH_LONG).show()
                     clearView(view)
                 }
             }
@@ -172,7 +173,7 @@ class WeeklyPlanFragment : Fragment() {
     }
 
     private fun clearView(view: View) {
-        view.WeeklyPlan_Date_Button.text = SharedTag.getDate
+        view.WeeklyPlan_Date_Button.text = Massages.getDate
         visitDate = null
         hospitalList.clear()
         doctorList.clear()

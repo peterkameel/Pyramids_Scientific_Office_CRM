@@ -27,7 +27,7 @@ data class DailyVisitModel(
 
 data class LoginModel(
     var user_name: String? ="",
-    var ID: String? ="",
+    var id: String? ="",
     var supervisor_ID: String? = "",
     var permission: String? = ""
 )

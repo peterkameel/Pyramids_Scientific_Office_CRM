@@ -32,7 +32,6 @@ class LoginActivity : AppCompatActivity() {
             this
         ).isConnectToInternet
     }
-
     private val database = Firebase.database.reference
 
     override fun onCreate(savedInstanceState: Bundle?) {

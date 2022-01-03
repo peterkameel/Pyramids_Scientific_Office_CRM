@@ -8,12 +8,4 @@ object SharedTag {
     const val permission: String = "permission"
     const val MainFragmentTAG: String = "MainFragment"
     const val FragmentTAG: String = "frag"
-
-    //Toast Massages
-    const val hospital: String = "Choose a Hospital"
-    const val doctor: String = "Choose a Doctor"
-    const val area: String = "Choose an Area"
-    const val date: String = "Choose the Date"
-    const val getDate: String = "Get the Date"
-    const val addPlan: String = " Plan add Successfully"
 }
