@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "454118716131",
+    "firebase_url": "https://peterkameel-default-rtdb.firebaseio.com",
+    "project_id": "peterkameel",
+    "storage_bucket": "peterkameel.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454118716131:android:1ef0e497c1207226334bd6",
+        "android_client_info": {
+          "package_name": "com.peter_kameel.pyramidsscientificofficecrm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "454118716131-s63lupi9gk7g1a4evhdklsq8vc79f923.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD89tIVg4upAT_RLAY_iMUutzJ-a0bHwqg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "454118716131-s63lupi9gk7g1a4evhdklsq8vc79f923.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

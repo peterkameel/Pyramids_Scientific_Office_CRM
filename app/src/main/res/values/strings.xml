@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Pyramids Scientific Office CRM</string>
+    <!--Navigation Menu-->
+    <string name="main">Main</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="create_new">Create New</string>
+    <string name="new_area">New Area</string>
+    <string name="new_doctor">New Doctor</string>
+    <string name="new_hospital">New Hospital</string>
+    <string name="daily_visit">Daily Visit</string>
+    <string name="visit">Daily Visit</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="Hi">Hi</string>
+    <string name="plan">Start Plan</string>
+    <string name="Setting">Setting</string>
+    <string name="User_Guide">User Guide</string>
+    <string name="logout">Logout</string>
+    <string name="ADD_Medical_Rep">Add New MR.</string>
+
+    <!--new area fragment-->
+    <string name="AreaName">Area Name</string>
+    <string name="Create">Create New Area</string>
+
+    <!--new doctor fragment-->
+    <string name="new_doctor_name">Doctor Name</string>
+    <string name="Doctor_Specialization">Doctor Specialization</string>
+    <string name="Doctor_Area">Doctor Area</string>
+    <string name="Save_Location">Get Current Location</string>
+    <string name="Create_Doctor">Create New Doctor</string>
+
+    <!--new hospital fragment-->
+    <string name="new_hospital_name">Hospital Name</string>
+    <string name="Create_Hospital">Create New Hospital</string>
+
+    <!--daily visits-->
+    <string name="daily_visit_date">Get the Date</string>
+    <string name="daily_visit_AM_PM">AM / PM</string>
+    <string name="daily_visit_hospital">Choose a Hospital</string>
+    <string name="daily_visit_area">Choose Area</string>
+    <string name="daily_visit_doctor">Choose a Doctor</string>
+    <string name="daily_visit_comment">Comment</string>
+    <string name="daily_visit_location">Get Location</string>
+    <string name="daily_visit_button">Save the Visit</string>
+
+
+    <!--login activity-->
+    <string name="login_AppName">Pyramids Scientific Office</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="Remember">Remember me</string>
+    <string name="forget_password">Forget Password</string>
+    <string name="login">Login</string>
+
+    <!--Weekly Plan-->
+    <string name="WeeklyPlan_Hospital">Hospital</string>
+    <string name="WeeklyPlan_Doctor">Doctor</string>
+    <string name="WeeklyPlan_add">ADD</string>
+    <string name="WeeklyPlan_create">Save The Plan</string>
+
+    <!--New Medical RP.-->
+    <string name="new_user_name">Name of Medical RP.</string>
+    <string name="new_user_password">Initial Password</string>
+    <string name="new_user_email">Email of Medical RP.</string>
+    <string name="Create_User">Create</string>
+
+</resources>

@@ -1,0 +1,54 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/main">
+        <menu>
+            <item
+                android:id="@+id/Dashboard"
+                android:icon="@drawable/ic_baseline_dashboard_24"
+                android:title="@string/dashboard" />
+        </menu>
+    </item>
+
+    <item android:title="@string/create_new">
+        <menu>
+            <item
+                android:id="@+id/New_Area"
+                android:icon="@drawable/ic_gps_location_icon"
+                android:title="@string/new_area" />
+            <item
+                android:id="@+id/New_Doctor"
+                android:icon="@drawable/ic_doctor_hospital_icon"
+                android:title="@string/new_doctor" />
+            <item
+                android:id="@+id/New_Hospital"
+                android:icon="@drawable/ic_hospital_medical_icon"
+                android:title="@string/new_hospital" />
+        </menu>
+    </item>
+
+    <item android:title="@string/daily_visit">
+        <menu>
+            <item
+                android:id="@+id/visit"
+                android:icon="@drawable/ic_pointer_icon"
+                android:title="@string/visit" />
+            <item
+                android:id="@+id/plan"
+                android:icon="@drawable/ic_plan_icon"
+                android:title="@string/plan" />
+        </menu>
+    </item>
+
+    <item android:title="@string/Setting">
+        <menu>
+            <item
+                android:id="@+id/User_Guide"
+                android:icon="@drawable/ic_guide_icon"
+                android:title="@string/User_Guide" />
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/ic_logout_icon"
+                android:title="@string/logout" />
+        </menu>
+    </item>
+
+</menu>

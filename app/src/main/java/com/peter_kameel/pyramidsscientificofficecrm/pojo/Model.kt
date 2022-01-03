@@ -1,0 +1,42 @@
+package com.peter_kameel.pyramidsscientificofficecrm.pojo
+
+data class AreaModel ( var name: String? = "")
+
+data class DoctorModel (
+    var name: String? = "",
+    var specialization: String? = "",
+    var area: String? = "",
+    var latitude: String? = "",
+    var longitude: String? = ""
+        )
+
+data class HospitalModel(
+    var name: String? = "",
+    var latitude: String? = "",
+    var longitude: String? = ""
+)
+
+data class DailyVisitModel(
+    var date: String? = "",
+    var time: String? = "",
+    var hospital: String? = "",
+    var area: String? = "",
+    var doctor: String? = "",
+    var comment: String? =""
+)
+
+data class LoginModel(
+    var user_name: String? ="",
+    var ID: String? ="",
+    var supervisor_ID: String? = "",
+    var permission: String? = ""
+)
+
+data class WeeklyPlanModel(
+    var AM: ArrayList<HospitalModel>,
+    var PM: ArrayList<DoctorModel>
+)
+
+data class WeeklyPlanRecyclerModel(
+    var name: String? = ""
+)

@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/main">
+        <menu>
+            <item
+                android:id="@+id/Dashboard"
+                android:icon="@drawable/ic_baseline_dashboard_24"
+                android:title="@string/dashboard" />
+        </menu>
+    </item>
+    <item android:title="@string/Setting">
+        <menu>
+            <item
+                android:id="@+id/User_Guide"
+                android:icon="@drawable/ic_guide_icon"
+                android:title="@string/User_Guide" />
+            <item
+                android:id="@+id/ADD_Medical_Rep"
+                android:icon="@drawable/ic_baseline_account_box_24"
+                android:title="@string/ADD_Medical_Rep" />
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/ic_logout_icon"
+                android:title="@string/logout" />
+        </menu>
+    </item>
+
+</menu>
