@@ -25,6 +25,7 @@ class DailyVisitViewModel: ViewModel() {
     val singleDoctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>()}
 
     val singleHospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>()}
+
     private val database = Firebase.database.reference
 
     fun getHospitalList(uid: String) {

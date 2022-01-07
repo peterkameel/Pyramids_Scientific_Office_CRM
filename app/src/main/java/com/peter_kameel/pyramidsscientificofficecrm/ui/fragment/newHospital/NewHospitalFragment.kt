@@ -73,7 +73,7 @@ class NewHospitalFragment : Fragment() {
                 ) {
                 }
                 fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_HIGH_ACCURACY,
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
                     cts.token
                 )
                     .addOnSuccessListener { location: Location? ->

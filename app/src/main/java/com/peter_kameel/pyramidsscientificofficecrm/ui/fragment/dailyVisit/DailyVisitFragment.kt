@@ -158,7 +158,7 @@ class DailyVisitFragment : Fragment() {
                 ) {
                 }
                 fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_HIGH_ACCURACY,
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
                     cts.token
                 )
                     .addOnSuccessListener { location: Location? ->
@@ -167,7 +167,7 @@ class DailyVisitFragment : Fragment() {
                                 calculateDistance(location!!.longitude,location.latitude,doctorLongitude,doctorLatitude)
                             if (distance <= 200) {
                                 view.daily_visit_create_button.isEnabled = true
-                                view.Location_Visit_Button.text = "${String.format("%.2f", distance)} meter"
+                                view.Location_Visit_Button.text = "Distance Is Ok"
                             } else {
                                 view.Location_Visit_Button.text = "Distance more than 200 meter"
                             }

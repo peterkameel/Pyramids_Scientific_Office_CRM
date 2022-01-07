@@ -24,7 +24,6 @@ class DailyVisitRecyclerAdapter (private var list: ArrayList<DailyVisitModel>)
         val item = list[position]
         if (item.hospital.isNullOrEmpty()){
             holder.name.text = item.doctor
-            holder.area.text = item.area
         }else {
             holder.name.text = item.hospital
         }

@@ -1,12 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item android:title="@string/main">
         <menu>
             <item
-                android:id="@+id/Dashboard"
+                android:id="@+id/SUP_Dashboard"
                 android:icon="@drawable/ic_baseline_dashboard_24"
                 android:title="@string/dashboard" />
         </menu>
     </item>
+
     <item android:title="@string/Setting">
         <menu>
             <item
@@ -17,6 +19,10 @@
                 android:id="@+id/ADD_Medical_Rep"
                 android:icon="@drawable/ic_baseline_account_box_24"
                 android:title="@string/ADD_Medical_Rep" />
+            <item
+                android:id="@+id/Delete_Medical_Rep"
+                android:icon="@drawable/ic_baseline_delete_forever_24"
+                android:title="@string/Delete_Medical_Rep" />
             <item
                 android:id="@+id/logout"
                 android:icon="@drawable/ic_logout_icon"

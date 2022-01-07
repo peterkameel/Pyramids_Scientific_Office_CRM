@@ -64,5 +64,9 @@
     <string name="new_user_password">Initial Password</string>
     <string name="new_user_email">Email of Medical RP.</string>
     <string name="Create_User">Create</string>
+    <string name="AMText">AM Visits</string>
+    <string name="PmText">PM Visits</string>
+    <string name="Delete_Medical_Rep">Delete Medical RP.</string>
+    <string name="imageButton">Image Button</string>
 
 </resources>
