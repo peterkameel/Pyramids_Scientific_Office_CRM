@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.weeklyPlan
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.weeklyPlan
 
 import android.os.Bundle
 import android.util.Log

@@ -19,9 +19,9 @@ data class HospitalModel(
 data class DailyVisitModel(
     var date: String? = "",
     var time: String? = "",
-    var hospital: String? = "",
+    var hospital: HospitalModel? = null ,
     var area: String? = "",
-    var doctor: String? = "",
+    var doctor: DoctorModel? = null,
     var comment: String? =""
 )
 

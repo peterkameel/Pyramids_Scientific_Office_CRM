@@ -13,7 +13,7 @@ class DailyVisitRecyclerAdapter (private var list: ArrayList<DailyVisitModel>)
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
         val name = item.item_doctor_name_in_recycler!!
-        val area = item.item_doctor_Specialization_in_recycler!!
+        val specialization = item.item_doctor_Specialization_in_recycler!!
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,10 +22,11 @@ class DailyVisitRecyclerAdapter (private var list: ArrayList<DailyVisitModel>)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
-        if (item.hospital.isNullOrEmpty()){
-            holder.name.text = item.doctor
-        }else {
-            holder.name.text = item.hospital
+        if (item.time == "AM"){
+            holder.name.text = item.hospital!!.name
+        }else if (item.time == "PM"){
+            holder.name.text = item.doctor!!.name
+            holder.specialization.text = item.doctor!!.specialization
         }
     }
 

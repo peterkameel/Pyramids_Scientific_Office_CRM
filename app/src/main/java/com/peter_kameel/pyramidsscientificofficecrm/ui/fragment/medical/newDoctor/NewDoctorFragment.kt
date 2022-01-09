@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.newDoctor
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newDoctor
 
 import android.Manifest
 import android.content.Context
@@ -86,7 +86,7 @@ class NewDoctorFragment : Fragment() {
                 ) {
                 }
                 fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
+                    LocationRequest.PRIORITY_HIGH_ACCURACY,
                     cts.token
                 )
                     .addOnSuccessListener { location: Location? ->

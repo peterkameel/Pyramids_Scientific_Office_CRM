@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.dailyVisit
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.dailyVisit
 
 import android.Manifest
 import android.content.Context
@@ -23,6 +23,9 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
+import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
+import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.daily_visit.view.*
@@ -44,8 +47,8 @@ class DailyVisitFragment : Fragment() {
     private val cts = CancellationTokenSource()
     private var gpsEnabled: Boolean = false
 
-    var doctorLatitude: Double = 0.0
-    var doctorLongitude: Double = 0.0
+    private var doctor = DoctorModel()
+    private var hospital = HospitalModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,9 +119,41 @@ class DailyVisitFragment : Fragment() {
             viewModel.getSingleHospital(it.toString(), uid)
         }
         viewModel.singleHospitalLiveData.observeForever {
-            val hospital = it[0]
-            doctorLatitude = hospital.latitude!!.toDouble()
-            doctorLongitude = hospital.longitude!!.toDouble()
+            hospital = it[0]
+            try {
+                gpsEnabled = locationManger.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            } catch (ex: Exception) {
+            }
+            if (gpsEnabled) {
+                if (ActivityCompat.checkSelfPermission(
+                        context!!,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        context!!,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                }
+                fusedLocationClient.getCurrentLocation(
+                    LocationRequest.PRIORITY_HIGH_ACCURACY,
+                    cts.token
+                ).addOnSuccessListener { location: Location? ->
+                            val distance =
+                                calculateDistance(
+                                    location!!.longitude,
+                                    location.latitude,
+                                    hospital.longitude!!.toDouble(),
+                                    hospital.latitude!!.toDouble())
+                            if (distance <= 200) {
+                                view.daily_visit_create_button.isEnabled = true
+                                view.Location_Visit_Button.text = Massages.DistanceOk
+                            } else {
+                                view.Location_Visit_Button.text = Massages.DistanceNotOk
+                            }
+                        }
+            } else {
+                Snackbar.make(view, "Enable GPS!", Snackbar.LENGTH_LONG).show()
+            }
         }
         view.daily_visit_area.doAfterTextChanged {
             viewModel.getDoctorList(it.toString(), uid)
@@ -137,16 +172,11 @@ class DailyVisitFragment : Fragment() {
             viewModel.getSingleDoctor(it.toString(), uid)
         }
         viewModel.singleDoctorLiveData.observeForever {
-            val doctor = it[0]
-            doctorLatitude = doctor.latitude!!.toDouble()
-            doctorLongitude = doctor.longitude!!.toDouble()
-        }
-        //Get Location
-        view.Location_Visit_Button.setOnClickListener {
+            doctor = it[0]
             try {
-                gpsEnabled = locationManger.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            } catch (ex: Exception) {
-            }
+            gpsEnabled = locationManger.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        } catch (ex: Exception) {
+        }
             if (gpsEnabled) {
                 if (ActivityCompat.checkSelfPermission(
                         context!!,
@@ -158,21 +188,23 @@ class DailyVisitFragment : Fragment() {
                 ) {
                 }
                 fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
+                    LocationRequest.PRIORITY_HIGH_ACCURACY,
                     cts.token
                 )
                     .addOnSuccessListener { location: Location? ->
-                        if (doctorLatitude != 0.0 && doctorLongitude != 0.0) {
                             val distance =
-                                calculateDistance(location!!.longitude,location.latitude,doctorLongitude,doctorLatitude)
+                                calculateDistance(
+                                    location!!.longitude,
+                                    location.latitude,
+                                    doctor.longitude!!.toDouble(),
+                                    doctor.latitude!!.toDouble())
                             if (distance <= 200) {
                                 view.daily_visit_create_button.isEnabled = true
-                                view.Location_Visit_Button.text = "Distance Is Ok"
+                                view.Location_Visit_Button.text = Massages.DistanceOk
                             } else {
-                                view.Location_Visit_Button.text = "Distance more than 200 meter"
+                                view.Location_Visit_Button.text = Massages.DistanceNotOk
                             }
                         }
-                    }
             } else {
                 Snackbar.make(view, "Enable GPS!", Snackbar.LENGTH_LONG).show()
             }
@@ -189,7 +221,7 @@ class DailyVisitFragment : Fragment() {
                             val visit = DailyVisitModel(
                                 visitDate,
                                 view.daily_visit_AM.text.toString(),
-                                view.daily_visit_hospital.text.toString(),
+                                hospital,
                                 null,null,
                                 view.daily_visit_comment.text.toString()
                             )
@@ -205,7 +237,7 @@ class DailyVisitFragment : Fragment() {
                                 view.daily_visit_AM.text.toString(),
                                 null,
                                 view.daily_visit_area.text.toString(),
-                                view.daily_visit_doctor.text.toString(),
+                                doctor,
                                 view.daily_visit_comment.text.toString()
                             )
                             viewModel.saveNewVisit(visit,uid)

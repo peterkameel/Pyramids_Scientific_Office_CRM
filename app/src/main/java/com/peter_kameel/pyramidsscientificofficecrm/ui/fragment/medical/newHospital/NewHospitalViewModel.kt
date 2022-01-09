@@ -1,5 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.newArea
-
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newHospital
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,27 +8,27 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
+import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 
-class NewAreaViewModel: ViewModel() {
+class NewHospitalViewModel: ViewModel() {
 
-    val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>() }
+    val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
 
     private val database = Firebase.database.reference
 
-    fun getAreaList(uid: String) {
+    fun getHospitalList(uid: String) {
         database.child("USERS")
             .child(uid)
-            .child("Area")
-            .addValueEventListener(object : ValueEventListener{
+            .child("Hospital")
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<AreaModel>()
+                    val list = ArrayList<HospitalModel>()
                     for (postSnapshot in snapshot.children) {
                         if (postSnapshot.hasChildren()){
-                            postSnapshot.getValue<AreaModel>()?.let { list.add(it) }
+                            postSnapshot.getValue<HospitalModel>()?.let { list.add(it) }
                         }
                     }
-                    areaLiveData.postValue(list)
+                    hospitalLiveData.postValue(list)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -39,13 +38,12 @@ class NewAreaViewModel: ViewModel() {
             })
     }
 
-    fun saveNewArea(areaName: String,uid: String) {
-        val area = AreaModel(areaName)
+    fun saveNewHospital(hospital: HospitalModel,uid: String) {
         database.child("USERS")
             .child(uid)
-            .child("Area")
-            .child(areaName)
-            .setValue(area)
+            .child("Hospital")
+            .child(hospital.name.toString())
+            .setValue(hospital)
     }
 
 }

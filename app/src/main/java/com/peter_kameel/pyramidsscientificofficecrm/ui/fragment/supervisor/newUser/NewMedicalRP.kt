@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.newUser
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.newUser
 
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +16,7 @@ import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.dailyVisit.DailyVisitViewModel
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.dailyVisit.DailyVisitViewModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag

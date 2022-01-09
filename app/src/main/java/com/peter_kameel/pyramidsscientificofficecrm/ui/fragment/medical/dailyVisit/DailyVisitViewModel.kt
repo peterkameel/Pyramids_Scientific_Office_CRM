@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.weeklyPlan
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.dailyVisit
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,14 +9,14 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
+import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanModel
 import kotlin.random.Random
 
-class WeeklyPlanViewModel: ViewModel() {
+class DailyVisitViewModel: ViewModel() {
 
-    val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
+    val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>()}
 
     val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>()}
 
@@ -54,7 +54,7 @@ class WeeklyPlanViewModel: ViewModel() {
         database.child("USERS")
             .child(uid)
             .child("Area")
-            .addValueEventListener(object : ValueEventListener {
+            .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val list = ArrayList<AreaModel>()
                     for (postSnapshot in snapshot.children) {
@@ -141,11 +141,12 @@ class WeeklyPlanViewModel: ViewModel() {
             })
     }
 
-    fun createPlan(date: String ,plan: WeeklyPlanModel, uid: String){
+    fun saveNewVisit(visit: DailyVisitModel,uid: String) {
         database.child("USERS")
             .child(uid)
-            .child("Plan")
-            .child(date)
-            .setValue(plan)
+            .child("Visit")
+            .child(visit.date.toString())
+            .child(Random.nextInt(0, 100).toString())
+            .setValue(visit)
     }
 }

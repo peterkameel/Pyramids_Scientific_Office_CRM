@@ -14,4 +14,13 @@ object Massages {
     const val medicalEmail: String = "Please Enter Medical Email"
     const val error: String = "Some thing is wrong try again"
     const val successful: String = "Medical Add Successfully"
+    const val DistanceOk: String = "Distance is Ok"
+    const val DistanceNotOk: String = "Distance more than 200 meter"
+
+    //type of listener
+    const val typeDoctor: String = "Doctor"
+    const val typeHospital: String = "Hospital"
+    const val typeMrVisit: String = "MrVisit"
+    const val typeSupVisit: String = "SupVisit"
+    const val typePlan: String = "Plan"
 }

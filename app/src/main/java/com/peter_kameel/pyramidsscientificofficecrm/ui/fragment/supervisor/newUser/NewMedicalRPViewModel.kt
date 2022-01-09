@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.newUser
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.newUser
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

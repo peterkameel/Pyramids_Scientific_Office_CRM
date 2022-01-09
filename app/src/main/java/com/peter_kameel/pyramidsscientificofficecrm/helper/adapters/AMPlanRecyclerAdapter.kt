@@ -8,16 +8,15 @@ import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import kotlinx.android.synthetic.main.item_doctor_name_recycler.view.*
 
-class HospitalRecyclerAdapter(private var list: ArrayList<HospitalModel>)
-    : RecyclerView.Adapter<HospitalRecyclerAdapter.ViewHolder>() {
+class AMPlanRecyclerAdapter(private val list: ArrayList<HospitalModel>)
+    :RecyclerView.Adapter<AMPlanRecyclerAdapter.ViewHolder>() {
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
-        val name = item.item_doctor_name_in_recycler!!
+        val name = item.item_doctor_name_in_recycler
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_doctor_name_recycler, parent, false)
-        )
+        return ViewHolder( LayoutInflater.from(parent.context).inflate(R.layout.item_doctor_name_recycler, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -25,6 +24,6 @@ class HospitalRecyclerAdapter(private var list: ArrayList<HospitalModel>)
         holder.name.text = item.name
     }
 
-    override fun getItemCount() = list.size
+    override fun getItemCount(): Int = list.size
 
 }

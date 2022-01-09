@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supDashboard
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.supDashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,11 +9,14 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.SupDashboardRecyclerAdapter
+import com.peter_kameel.pyramidsscientificofficecrm.helper.interfaces.ClickInsideFragmentListener
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.sup_dashboard_fregment.view.*
 
-class SupDashboardFragment : Fragment() {
+class SupDashboardFragment(
+    private val listener: ClickInsideFragmentListener
+) : Fragment() {
 
     val viewModel by viewModels<SupDashboardViewModel>()
 
@@ -34,7 +37,7 @@ class SupDashboardFragment : Fragment() {
         viewModel.getListOfMedical(uid)
         //show the list
         viewModel.medicalLiveData.observeForever {
-            view.SUP_Dashboard_RecyclerView.adapter = SupDashboardRecyclerAdapter(it)
+            view.SUP_Dashboard_RecyclerView.adapter = SupDashboardRecyclerAdapter(it,listener)
         }
         return view
     }

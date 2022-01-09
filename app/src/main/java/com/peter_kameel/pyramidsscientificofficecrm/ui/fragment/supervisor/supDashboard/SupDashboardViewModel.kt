@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supDashboard
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.supDashboard
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

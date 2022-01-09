@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.newArea
+package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newArea
 
 import android.os.Bundle
 import android.view.LayoutInflater
