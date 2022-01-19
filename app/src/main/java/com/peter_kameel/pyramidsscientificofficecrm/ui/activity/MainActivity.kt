@@ -1,12 +1,14 @@
 package com.peter_kameel.pyramidsscientificofficecrm.ui.activity
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.interfaces.ClickInsideFragmentListener
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
@@ -15,19 +17,20 @@ import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.fragment
 import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newArea.NewAreaFragment
 import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newDoctor.NewDoctorFragment
 import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newHospital.NewHospitalFragment
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.newUser.NewMedicalRP
 import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.weeklyPlan.WeeklyPlanFragment
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.medicalRpList.MedicalRPList
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.newUser.NewMedicalRP
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.supDashboard.SupDashboardFragment
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.activity_main.*
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.medicalRpList.MedicalRPList
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.supDashboard.SupDashboardFragment
-import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 
-class MainActivity : AppCompatActivity(), ClickInsideFragmentListener, NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(),
+    ClickInsideFragmentListener,
+    NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var toggle: ActionBarDrawerToggle
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -49,6 +52,9 @@ class MainActivity : AppCompatActivity(), ClickInsideFragmentListener, Navigatio
             //Show the main Fragment
             replaceFragment(SupDashboardFragment(this),SharedTag.FragmentTAG)
         }
+
+
+        Log.e("UserID",FirebaseAuth.getInstance().currentUser!!.uid)
     }
 
     //On toggle selected
@@ -102,11 +108,12 @@ class MainActivity : AppCompatActivity(), ClickInsideFragmentListener, Navigatio
 
     //fun to logout
     private fun logout() {
+        //close this activity
+        FirebaseAuth.getInstance().signOut()
         //for not skipping login activity
         Shared.saveSharedBoolean(this, SharedTag.User_Found, false)
         //Move to Login activity
         startActivity(Intent(this, LoginActivity::class.java))
-        //close this activity
         finish()
     }
 

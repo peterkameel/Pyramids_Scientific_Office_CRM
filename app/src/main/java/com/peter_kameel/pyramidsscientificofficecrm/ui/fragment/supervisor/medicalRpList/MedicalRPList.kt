@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.DoctorRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.HospitalRecyclerAdapter
@@ -45,19 +44,13 @@ class MedicalRPList(
             }
         }
         viewModel.doctorLiveData.observeForever {
-            view.H_D_RecyclerView.adapter = DoctorRecyclerAdapter(it)
+            view.H_D_RecyclerView.adapter = DoctorRecyclerAdapter(it,context!!)
         }
 
         viewModel.hospitalLiveData.observeForever {
-            view.H_D_RecyclerView.adapter = HospitalRecyclerAdapter(it)
+            view.H_D_RecyclerView.adapter = HospitalRecyclerAdapter(it,context!!)
         }
         return view
-    }
-
-    private fun convertLongToTime(time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat("dd-MM-yyyy")
-        return format.format(date)
     }
 
 }

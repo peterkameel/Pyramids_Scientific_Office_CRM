@@ -3,49 +3,34 @@ package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newArea
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
+import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NewAreaViewModel: ViewModel() {
 
     val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>() }
+    val massageLiveData: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
-    private val database = Firebase.database.reference
-
-    fun getAreaList(uid: String) {
-        database.child("USERS")
-            .child(uid)
-            .child("Area")
-            .addValueEventListener(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<AreaModel>()
-                    for (postSnapshot in snapshot.children) {
-                        if (postSnapshot.hasChildren()){
-                            postSnapshot.getValue<AreaModel>()?.let { list.add(it) }
-                        }
-                    }
-                    areaLiveData.postValue(list)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
+    fun getAreaList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.getAreaList(onSuccess = {
+                areaLiveData.postValue(it)
+            }, onError = {
 
             })
+        }
     }
 
-    fun saveNewArea(areaName: String,uid: String) {
-        val area = AreaModel(areaName)
-        database.child("USERS")
-            .child(uid)
-            .child("Area")
-            .child(areaName)
-            .setValue(area)
+    fun saveNewArea(area: AreaModel) {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.addNewArea(area, onSuccess = {
+                massageLiveData.postValue(it)
+            }, onError = {
+                massageLiveData.postValue(it)
+            })
+        }
     }
-
 }

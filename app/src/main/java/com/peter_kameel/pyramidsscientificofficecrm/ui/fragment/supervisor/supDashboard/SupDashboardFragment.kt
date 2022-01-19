@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.SupDashboardRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.helper.interfaces.ClickInsideFragmentListener
-import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
-import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.sup_dashboard_fregment.view.*
 
 class SupDashboardFragment(
@@ -31,10 +29,8 @@ class SupDashboardFragment(
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
         view.SUP_Dashboard_RecyclerView.layoutManager = manager
-        //get user id
-        val uid = Shared.readSharedString(context!!, SharedTag.UID,"false").toString()
         //get list of Medical
-        viewModel.getListOfMedical(uid)
+        viewModel.getListOfMedical()
         //show the list
         viewModel.medicalLiveData.observeForever {
             view.SUP_Dashboard_RecyclerView.adapter = SupDashboardRecyclerAdapter(it,listener)

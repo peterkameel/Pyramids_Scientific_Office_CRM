@@ -1,71 +1,64 @@
 package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newDoctor
 
+import android.content.Context
+import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
+import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
+import com.peter_kameel.pyramidsscientificofficecrm.helper.CheckLocation
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class NewDoctorViewModel: ViewModel() {
+class NewDoctorViewModel: ViewModel(){
+
     val doctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>() }
     val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>() }
+    val locationLiveData: MutableLiveData<Location> by lazy { MutableLiveData<Location>() }
+    val massageLiveData: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
-    private val database = Firebase.database.reference
-
-    fun getAreaList(uid: String) {
-        database.child("USERS")
-            .child(uid)
-            .child("Area")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<AreaModel>()
-                    for (postSnapshot in snapshot.children) {
-                        if (postSnapshot.hasChildren()){
-                            postSnapshot.getValue<AreaModel>()?.let { list.add(it) }
-                        }
-                    }
-                    areaLiveData.postValue(list)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
+    fun getAreaList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.getAreaList(onSuccess = {
+                areaLiveData.postValue(it)
+            }, onError = {
 
             })
+        }
     }
 
-    fun getDoctorList(uid: String) {
-        database.child("USERS")
-            .child(uid)
-            .child("Doctor")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<DoctorModel>()
-                    for (postSnapshot in snapshot.children) {
-                        if (postSnapshot.hasChildren()){
-                            postSnapshot.getValue<DoctorModel>()?.let { list.add(it) }
-                        }
-                    }
-                    doctorLiveData.postValue(list)
+    fun getDoctorList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.getDoctorList(
+                onSuccess = {
+                    doctorLiveData.postValue(it)
+                },
+                onError = {
+                    massageLiveData.postValue(it)
                 }
+            )
+        }
+    }
 
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-
+    fun saveNewDoctor(doctor: DoctorModel) {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.addNewDoctor(doctor, onSuccess = {
+                massageLiveData.postValue(it)
+            }, onError = {
+                massageLiveData.postValue(it)
             })
+        }
     }
 
-    fun saveNewDoctor(doctor: DoctorModel, uid: String) {
-        database.child("USERS")
-            .child(uid)
-            .child("Doctor")
-            .child(doctor.name.toString())
-            .setValue(doctor)
+    fun getLocation(ctx: Context){
+        CoroutineScope(Dispatchers.Main).launch {
+            CheckLocation.getCurrent1location(ctx, onSuccess = {
+                locationLiveData.postValue(it)
+            }, onError = {
+                massageLiveData.postValue(it)
+            })
+        }
     }
 }

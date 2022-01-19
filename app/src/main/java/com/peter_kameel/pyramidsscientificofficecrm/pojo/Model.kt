@@ -33,8 +33,8 @@ data class LoginModel(
 )
 
 data class WeeklyPlanModel(
-    var AM: ArrayList<HospitalModel>,
-    var PM: ArrayList<DoctorModel>
+    var AM: ArrayList<HospitalModel>? = null,
+    var PM: ArrayList<DoctorModel>? = null
 )
 
 data class WeeklyPlanRecyclerModel(

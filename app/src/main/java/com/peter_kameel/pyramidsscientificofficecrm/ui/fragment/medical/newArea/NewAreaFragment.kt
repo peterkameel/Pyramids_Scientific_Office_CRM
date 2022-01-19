@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.AreaRecyclerAdapter
+import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.new_area_fragment.view.*
@@ -32,7 +34,7 @@ class NewAreaFragment : Fragment() {
         //get user id
         val uid = Shared.readSharedString(context!!, SharedTag.UID,"false").toString()
         //call area list
-        viewModel.getAreaList(uid)
+        viewModel.getAreaList()
         //on live data set changed
         viewModel.areaLiveData.observeForever {
             view.AreaRecyclerView.adapter = AreaRecyclerAdapter(it)
@@ -42,9 +44,12 @@ class NewAreaFragment : Fragment() {
             if (view.New_Area_Name_.text.isNullOrEmpty()){
                 Snackbar.make(view,"Enter Area Name", Snackbar.LENGTH_LONG).show()
             }else{
-                viewModel.saveNewArea(view.New_Area_Name_.text.toString(),uid)
+                viewModel.saveNewArea(AreaModel(view.New_Area_Name_.text.toString()))
                 view.New_Area_Name_.text!!.clear()
             }
+        }
+        viewModel.massageLiveData.observeForever {
+            Toast.makeText(context,it,Toast.LENGTH_LONG).show()
         }
 
         return view

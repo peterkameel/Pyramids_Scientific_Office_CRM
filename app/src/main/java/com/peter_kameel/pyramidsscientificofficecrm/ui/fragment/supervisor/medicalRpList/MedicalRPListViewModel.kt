@@ -2,64 +2,44 @@ package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.medi
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
+import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MedicalRPListViewModel: ViewModel() {
 
     val doctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>() }
-
     val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
-
-    val visitLiveData: MutableLiveData<ArrayList<DailyVisitModel>> by lazy { MutableLiveData<ArrayList<DailyVisitModel>>() }
-
-    private val database = Firebase.database.reference
+    val massageLiveData: MutableLiveData<String> by lazy { MutableLiveData<String>() }
 
     fun getListOfDoctors(uid: String){
-        database.child("USERS")
-            .child(uid)
-            .child("Doctor")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<DoctorModel>()
-                    for (postSnapshot in snapshot.children) {
-                        if (postSnapshot.hasChildren()) {
-                            postSnapshot.getValue<DoctorModel>()?.let { list.add(it) }
-                        }
-                    }
-                    doctorLiveData.postValue(list)
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.getDoctorListByMedicalID(
+                uid,
+                onSuccess = {
+                    doctorLiveData.postValue(it)
+                },
+                onError = {
+                    massageLiveData.postValue(it)
                 }
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            })
+            )
+        }
     }
 
     fun getListOfHospitals(uid: String){
-        database.child("USERS")
-            .child(uid)
-            .child("Hospital")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = ArrayList<HospitalModel>()
-                    for (postSnapshot in snapshot.children) {
-                        if (postSnapshot.hasChildren()) {
-                            postSnapshot.getValue<HospitalModel>()?.let { list.add(it) }
-                        }
-                    }
-                    hospitalLiveData.postValue(list)
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseDBRepo.getHospitalsListByMedicalID(
+                uid,
+                onSuccess = {
+                    hospitalLiveData.postValue(it)
+                },
+                onError = {
+                    massageLiveData.postValue(it)
                 }
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            })
+            )
+        }
     }
-
 }

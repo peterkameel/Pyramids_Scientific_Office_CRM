@@ -14,6 +14,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         app:cardCornerRadius="@dimen/CardView_Radius"
+        app:layout_constraintBottom_toTopOf="@+id/WeeklyPlanRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,11 +27,10 @@
                 android:id="@+id/WeeklyPlan_Date_Button"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:text="@string/daily_visit_date"
                 android:textAlignment="viewStart"
                 android:textColor="@color/Dark_Green"
@@ -38,11 +38,12 @@
                 app:layout_constraintBottom_toTopOf="@+id/linearLayoutCompat"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.48000002" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/linearLayoutCompat"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
@@ -54,12 +55,13 @@
                 <!--Choose a Hospital-->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/Weekly_Plan_Hospital_layout"
-                    android:layout_weight="6"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
+                    android:layout_weight="6"
                     android:hint="@string/WeeklyPlan_Hospital">
+
                     <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                         android:id="@+id/Weekly_Plan_Hospital_text"
                         android:layout_width="match_parent"
@@ -70,16 +72,16 @@
                 </com.google.android.material.textfield.TextInputLayout>
                 <!--Save the hospital-->
                 <Button
-                    android:layout_weight="1"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:id="@+id/Weekly_Plan_Save_Hospital"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:layout_weight="1"
                     android:background="@color/Dark_Green"
                     android:text="@string/WeeklyPlan_add"
-                    android:layout_gravity="center_vertical"
                     android:textColor="@color/Dark_Green"
-                    android:layout_marginStart="@dimen/_8sdp"
                     android:textSize="@dimen/_12ssp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
             <!--Choose an Area-->
@@ -87,9 +89,8 @@
                 android:id="@+id/Daily_visit_Area_TextInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:hint="@string/daily_visit_area"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayoutCompat2"
@@ -108,12 +109,10 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/linearLayoutCompat2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/Weekly_Plan_Save_Plan_Date"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -142,21 +141,21 @@
                 </com.google.android.material.textfield.TextInputLayout>
                 <!--Save / Create Button-->
                 <Button
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:id="@+id/Weekly_Plan_Save_Doctor"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/_8sdp"
                     android:layout_weight="1"
                     android:background="@color/Dark_Green"
                     android:text="@string/WeeklyPlan_add"
-                    android:layout_marginStart="@dimen/_8sdp"
                     android:textColor="@color/Dark_Green"
                     android:textSize="@dimen/_12ssp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
             <!--Save / Create Button-->
             <Button
                 android:id="@+id/Weekly_Plan_Save_Plan_Date"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/Dark_Green"

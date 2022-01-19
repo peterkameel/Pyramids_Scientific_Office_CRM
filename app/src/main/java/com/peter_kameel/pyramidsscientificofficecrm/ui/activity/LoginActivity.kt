@@ -3,27 +3,24 @@ package com.peter_kameel.pyramidsscientificofficecrm.ui.activity
 import android.animation.Animator
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
+import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
+import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
-import com.peter_kameel.pyramidsscientificofficecrm.R
-import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     //Check internet connection and save it in boolean value
@@ -32,8 +29,6 @@ class LoginActivity : AppCompatActivity() {
             this
         ).isConnectToInternet
     }
-    private val database = Firebase.database.reference
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -82,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
                 //if connection
                 check -> reset(email.text.toString())
                 //if no connection
-                else -> Toast.makeText(this, "Check Internet Connection", Toast.LENGTH_LONG).show()
+                else -> Toast.makeText(this, Massages.connection, Toast.LENGTH_LONG).show()
             }//End When
         }//End OnClickListener
     }
@@ -153,8 +148,7 @@ class LoginActivity : AppCompatActivity() {
                         true
                     ) //use this line to skip the activity
                 }//End if (checkBox.isChecked)
-                Shared.saveSharedString(this, SharedTag.UID, Firebase.auth.currentUser!!.uid)
-                saveLoginData(Firebase.auth.currentUser!!.uid)
+                saveLoginData(auth.currentUser!!.uid)
 
             } else {
                 //Remove LoginProgressBar
@@ -179,26 +173,25 @@ class LoginActivity : AppCompatActivity() {
             }//End Listener
     }
 
-    private fun saveLoginData(uid: String) {
-        database.child("USERS")
-            .child(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val user = snapshot.getValue<LoginModel>()
+    private fun saveLoginData(id: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            FirebaseDBRepo.getUserData(
+                id,
+                onSuccess = {
                     Shared.saveSharedString(
                         applicationContext,
                         SharedTag.user_name,
-                        user?.user_name.toString()
+                        it.user_name.toString()
                     )
                     Shared.saveSharedString(
                         applicationContext,
                         SharedTag.supervisor_ID,
-                        user?.supervisor_ID.toString()
+                        it.supervisor_ID.toString()
                     )
                     Shared.saveSharedString(
                         applicationContext,
                         SharedTag.permission,
-                        user?.permission.toString()
+                        it.permission.toString()
                     )
                     startActivity(
                         Intent(
@@ -207,11 +200,7 @@ class LoginActivity : AppCompatActivity() {
                         )
                     ) //move to activity
                     finish() // finish the activity
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            })
+                })
+        }
     }
 }

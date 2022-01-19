@@ -14,8 +14,6 @@ import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.DoctorRecycl
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.HospitalRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
-import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
-import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.fragment_main.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,8 +41,6 @@ class MainFragment(
         pmManager.orientation = LinearLayoutManager.VERTICAL
         view.AMRecyclerView.layoutManager = amManager
         view.PMRecyclerView.layoutManager = pmManager
-        //get user id
-        val uid = Shared.readSharedString(context!!, SharedTag.UID, "false").toString()
         //show date picker
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
@@ -53,18 +49,18 @@ class MainFragment(
                 .build()
         //on chose date
         datePicker.addOnPositiveButtonClickListener {
-            view.date_text.text = convertLongToTime(it)
+            val date = convertLongToTime(it)
+            view.date_text.text = date
             amList.clear()
             pMList.clear()
             view.AMRecyclerView.adapter!!.notifyDataSetChanged()
             view.PMRecyclerView.adapter!!.notifyDataSetChanged()
             if (type == Massages.typeSupVisit) {
-                viewModel.getVisitList(convertLongToTime(it), mrID!!)
-                view.date_text.text = "Visit`s of Date:  ${convertLongToTime(it)}"
+                viewModel.getVisitListBYDateAndID(convertLongToTime(it),mrID.toString())
+                view.date_text.text = Massages.visitsDate + date
             } else if (type == Massages.typePlan) {
-                viewModel.getPlanListHospital(convertLongToTime(it), mrID!!)
-                viewModel.getPlanListDoctor(convertLongToTime(it), mrID!!)
-                view.date_text.text = "Plan of Date:  ${convertLongToTime(it)}"
+                viewModel.getWeeklyPlanByDateAndID(date,mrID.toString())
+                view.date_text.text = Massages.planDate + date
             }
 
         }
@@ -75,19 +71,18 @@ class MainFragment(
 
         when (type) {
             Massages.typeMrVisit -> {
-                viewModel.getVisitList(date, uid)
+                viewModel.getVisitListBYDate(date)
                 view.date_text.isEnabled = false
             }
             Massages.typeSupVisit -> {
-                viewModel.getVisitList(date, mrID!!)
+                viewModel.getVisitListBYDateAndID(date, mrID.toString())
                 view.date_text.isEnabled = true
-                view.date_text.text = "Visit`s of Date:  $date"
+                view.date_text.text = Massages.visitsDate + date
             }
             Massages.typePlan -> {
-                viewModel.getPlanListHospital(date, mrID!!)
-                viewModel.getPlanListDoctor(date, mrID!!)
+                viewModel.getWeeklyPlanByDateAndID(date,mrID.toString())
                 view.date_text.isEnabled = true
-                view.date_text.text = "Plan of Date:  $date"
+                view.date_text.text = Massages.planDate + date
             }
         }
 
@@ -108,10 +103,14 @@ class MainFragment(
         }
 
         viewModel.weeklyPlanHospitalLiveData.observeForever {
-            view.AMRecyclerView.adapter = HospitalRecyclerAdapter(it)
+            if (!it.isNullOrEmpty()){
+                view.AMRecyclerView.adapter = HospitalRecyclerAdapter(it,context!!)
+            }
         }
         viewModel.weeklyPlanDoctorLiveData.observeForever {
-            view.PMRecyclerView.adapter = DoctorRecyclerAdapter(it)
+            if (!it.isNullOrEmpty()){
+                view.PMRecyclerView.adapter = DoctorRecyclerAdapter(it,context!!)
+            }
         }
 
         return view
@@ -119,7 +118,7 @@ class MainFragment(
 
     private fun convertLongToTime(time: Long): String {
         val date = Date(time)
-        val format = SimpleDateFormat("dd-MM-yyyy")
+        val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         return format.format(date)
     }
 

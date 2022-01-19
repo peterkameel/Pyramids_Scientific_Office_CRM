@@ -1,22 +1,15 @@
 package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.supervisor.newUser
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
-import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.dailyVisit.DailyVisitViewModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
@@ -69,7 +62,7 @@ class NewMedicalRP : Fragment() {
             }
         }
         //on user add successfully
-        viewModel.successLiveData.observeForever {
+        viewModel.massageLiveData.observeForever {
             if (it == Massages.successful){
                 clearView(view)
             }

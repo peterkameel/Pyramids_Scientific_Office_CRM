@@ -1,52 +1,36 @@
 package com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.medical.newDoctor
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.snackbar.Snackbar
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.DoctorRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
 import kotlinx.android.synthetic.main.new_doctor_fragment.view.*
-import java.lang.Exception
 
 class NewDoctorFragment : Fragment() {
     private val viewModel by viewModels<NewDoctorViewModel>() // initialize viewModel
-    private var userID : String? = null
-    //initialize for google play location services
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val cts = CancellationTokenSource()
-    private var gpsEnabled: Boolean = false
-    lateinit var doctorLocation: Location
+    private val uid by lazy { Shared.readSharedString(context!!, SharedTag.UID, "null").toString() }
+    private lateinit var doctorLocation: Location
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.new_doctor_fragment, container, false)
-        val uid = Shared.readSharedString(context!!, SharedTag.UID, "false").toString()
-        userID = uid
-        //get location client
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
-        //set location manger
-        val locationManger = context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // RecycleView set LayoutManager
         view.DoctorRecyclerView.setHasFixedSize(true)
         val manager = LinearLayoutManager(context)
@@ -55,7 +39,7 @@ class NewDoctorFragment : Fragment() {
         //get and store list of area
         viewModel.areaLiveData.observeForever {
             val areaList = arrayListOf<String>()
-            for (item in it){
+            for (item in it) {
                 areaList.add(item.name.toString())
             }
             //set area down list
@@ -64,54 +48,33 @@ class NewDoctorFragment : Fragment() {
             view.New_Doctor_Area_TextFiled.setAdapter(adapter)
         }
         //call Doctor list
-        viewModel.getDoctorList(uid)
+        viewModel.getDoctorList()
         //on live data set changed
         viewModel.doctorLiveData.observeForever {
-            view.DoctorRecyclerView.adapter = DoctorRecyclerAdapter(it)
+            view.DoctorRecyclerView.adapter = DoctorRecyclerAdapter(it,context!!)
         }
         //get the location
         view.Location_Visit_Button.setOnClickListener {
-            try {
-                gpsEnabled = locationManger.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            } catch (ex: Exception) {
-            }
-            if (gpsEnabled) {
-                if (ActivityCompat.checkSelfPermission(
-                        context!!,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        context!!,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                }
-                fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_HIGH_ACCURACY,
-                    cts.token
-                )
-                    .addOnSuccessListener { location: Location? ->
-                        val lat = location!!.latitude
-                        val lon = location.longitude
-                        view.Location_Visit_Button.text = "$lat , $lon"
-                        doctorLocation = location
-                        view.Create_New_Doctor_Button.isEnabled = true
-                    }
-
-            } else {
-                Snackbar.make(view, "Enable GPS!", Snackbar.LENGTH_LONG).show()
-            }
+            viewModel.getLocation(context!!)
+        }
+        viewModel.locationLiveData.observeForever {
+            val lat = it.latitude
+            val lon = it.longitude
+            view.Location_Visit_Button.text = "$lat , $lon"
+            doctorLocation = it
+            view.Create_New_Doctor_Button.isEnabled = true
         }
         //save the doctor
         view.Create_New_Doctor_Button.setOnClickListener {
-            when{
-                view.New_Doctor_Name_TextFiled.text.isNullOrEmpty() ->{
-                    Snackbar.make(view, "Enter Doctor Name!", Snackbar.LENGTH_LONG).show()
+            when {
+                view.New_Doctor_Name_TextFiled.text.isNullOrEmpty() -> {
+                    Snackbar.make(view, Massages.enterDoctorName, Snackbar.LENGTH_LONG).show()
                 }
-                view.New_Doctor_Specialization_TextFiled.text.isNullOrEmpty() ->{
-                    Snackbar.make(view, "Enter Doctor Specialization!", Snackbar.LENGTH_LONG).show()
+                view.New_Doctor_Specialization_TextFiled.text.isNullOrEmpty() -> {
+                    Snackbar.make(view, Massages.enterDoctorSp, Snackbar.LENGTH_LONG).show()
                 }
-                view.New_Doctor_Area_TextFiled.text.isNullOrEmpty() ->{
-                    Snackbar.make(view, "Enter Doctor Area!", Snackbar.LENGTH_LONG).show()
+                view.New_Doctor_Area_TextFiled.text.isNullOrEmpty() -> {
+                    Snackbar.make(view, Massages.enterDoctorArea, Snackbar.LENGTH_LONG).show()
                 }
                 else -> {
                     val doctor = DoctorModel(
@@ -121,18 +84,28 @@ class NewDoctorFragment : Fragment() {
                         doctorLocation.latitude.toString(),
                         doctorLocation.longitude.toString()
                     )
-                    viewModel.saveNewDoctor(doctor,uid)
+                    viewModel.saveNewDoctor(doctor)
                     view.New_Doctor_Name_TextFiled.text!!.clear()
                     view.New_Doctor_Specialization_TextFiled.text!!.clear()
                     view.New_Doctor_Area_TextFiled.text!!.clear()
                 }
             }
         }
+
+        //if gps not enabled show the massage
+        viewModel.massageLiveData.observeForever {
+            Toast.makeText(context!!, it, Toast.LENGTH_LONG).show()
+        }
+
         return view
     }
 
     override fun onStart() {
         super.onStart()
-        userID?.let { viewModel.getAreaList(it) }
+        uid.let { viewModel.getAreaList() }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
     }
 }

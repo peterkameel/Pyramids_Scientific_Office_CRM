@@ -68,5 +68,7 @@
     <string name="PmText">PM Visits</string>
     <string name="Delete_Medical_Rep">Delete Medical RP.</string>
     <string name="imageButton">Image Button</string>
+    <string name="intentLocation">Open Location On Maps</string>
+    <string name="deleteItem">Delete Item</string>
 
 </resources>
