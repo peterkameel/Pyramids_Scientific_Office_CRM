@@ -6,66 +6,89 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.NewHospitalFragmentBinding
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.HospitalRecyclerAdapter
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckNetwork
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
-import kotlinx.android.synthetic.main.new_hospital_fragment.view.*
+import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NewHospitalFragment : Fragment() {
     private val viewModel by viewModels<NewHospitalViewModel>()
+    private var _binding: NewHospitalFragmentBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
     private lateinit var doctorLocation: Location
+    @Inject
+    lateinit var checkNetwork: CheckNetwork
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.new_hospital_fragment, container, false)
+        _binding = NewHospitalFragmentBinding.inflate(inflater, container, false)
+        val view = binding.root
         // RecycleView set LayoutManager
-        view.HospitalRecyclerView.setHasFixedSize(true)
+        binding.HospitalRecyclerView.setHasFixedSize(true)
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
-        view.HospitalRecyclerView.layoutManager = manager
+        binding.HospitalRecyclerView.layoutManager = manager
 
         //call area list
         viewModel.getHospitalList()
         //on live data set changed
         viewModel.hospitalLiveData.observeForever {
-            view.HospitalRecyclerView.adapter = HospitalRecyclerAdapter(it,context!!)
+            binding.HospitalRecyclerView.adapter = HospitalRecyclerAdapter(it,requireContext(),activity as? AppCompatActivity)
         }
         //get the location
-        view.Location_Hospital_Button.setOnClickListener {
-            viewModel.getLocation(context!!)
+        binding.LocationHospitalButton.setOnClickListener {
+            if (checkNetwork.isNetworkAvailable()){
+                viewModel.getLocation(requireContext())
+            }else {
+                Toast.makeText(requireContext(), Massages.connection,Toast.LENGTH_LONG).show()
+            }
         }
         //observe on location when coming
         viewModel.locationLiveData.observeForever {
             val lat = it.latitude
             val lon = it.longitude
-            view.Location_Hospital_Button.text = "$lat , $lon"
+            binding.LocationHospitalButton.text = "$lat , $lon"
             doctorLocation = it
-            view.Create_Hospital.isEnabled = true
+            binding.CreateHospital.isEnabled = true
         }
         //save the doctor
-        view.Create_Hospital.setOnClickListener {
-            if (view.New_Hospital_Name_TextFiled.text.isNullOrEmpty()) {
-                Snackbar.make(view, "Enter Doctor Name!", Snackbar.LENGTH_LONG).show()
+        binding.CreateHospital.setOnClickListener {
+            if (binding.NewHospitalNameTextFiled.text.isNullOrEmpty()) {
+                Snackbar.make(binding.root, "Enter Doctor Name!", Snackbar.LENGTH_LONG).show()
             } else {
                 val hospital = HospitalModel(
-                    view.New_Hospital_Name_TextFiled.text.toString(),
+                    binding.NewHospitalNameTextFiled.text.toString(),
                     doctorLocation.latitude.toString(),
                     doctorLocation.longitude.toString()
                 )
                 viewModel.saveNewHospital(hospital)
-                view.New_Hospital_Name_TextFiled.text!!.clear()
+                binding.NewHospitalNameTextFiled.text!!.clear()
             }
         }
 
         viewModel.massageLiveData.observeForever {
-            Toast.makeText(context,it,Toast.LENGTH_LONG).show()
+            if (this.requireView().isVisible){
+                Toast.makeText(requireContext(),it,Toast.LENGTH_LONG).show()
+            }
         }
         return view
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

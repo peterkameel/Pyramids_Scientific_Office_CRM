@@ -5,21 +5,26 @@ import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
-import com.peter_kameel.pyramidsscientificofficecrm.helper.CheckLocation
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckLocation
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewHospitalViewModel: ViewModel() {
-
+@HiltViewModel
+class NewHospitalViewModel
+@Inject constructor(
+    private var firebaseDBRepo: FirebaseDBRepo,
+    private val checkLocation: CheckLocation
+    ) : ViewModel() {
     val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
     val massageLiveData: MutableLiveData<String> by lazy { MutableLiveData<String>() }
     val locationLiveData: MutableLiveData<Location> by lazy { MutableLiveData<Location>() }
-
     fun getHospitalList() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getHospitalList(
+            firebaseDBRepo.getHospitalList(
                 onSuccess = {
                     hospitalLiveData.postValue(it)
                 },
@@ -32,7 +37,7 @@ class NewHospitalViewModel: ViewModel() {
 
     fun saveNewHospital(hospital: HospitalModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.addNewHospital(
+            firebaseDBRepo.addNewHospital(
                 hospital,
                 onSuccess = {
                     massageLiveData.postValue(it)
@@ -45,7 +50,7 @@ class NewHospitalViewModel: ViewModel() {
 
     fun getLocation(ctx: Context){
         CoroutineScope(Dispatchers.Main).launch {
-            CheckLocation.getCurrent1location(ctx, onSuccess = {
+            checkLocation.getCurrentLocation(ctx, onSuccess = {
                 locationLiveData.postValue(it)
             }, onError = {
                 massageLiveData.postValue(it)

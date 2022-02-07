@@ -50,10 +50,6 @@
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
             <Button
                 android:id="@+id/sheetButtonLocation"
                 style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
@@ -61,22 +57,8 @@
                 android:textColor="@color/Dark_Green"
                 android:text="@string/intentLocation"
                 android:textSize="@dimen/_12ssp"
-                android:layout_margin="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <Button
-                android:id="@+id/sheetButtonDelete"
-                style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
-                app:icon="@drawable/ic_baseline_delete_forever_24"
-                android:textColor="@color/Dark_Green"
-                android:text="@string/deleteItem"
-                android:textSize="@dimen/_12ssp"
-                android:layout_margin="@dimen/_8sdp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:title="@string/main">
         <menu>
@@ -8,21 +9,28 @@
                 android:title="@string/dashboard" />
         </menu>
     </item>
-
+    <item android:title="@string/dataExport">
+        <menu>
+            <item
+                android:id="@+id/ExportPlan"
+                android:icon="@drawable/ic_export_svgrepo_com"
+                android:title="@string/ExportPlan" />
+            <item
+                android:id="@+id/VisitFile"
+                android:icon="@drawable/ic_export_svgrepo_com"
+                android:title="@string/VisitFile" />
+        </menu>
+    </item>
     <item android:title="@string/Setting">
         <menu>
             <item
-                android:id="@+id/User_Guide"
+                android:id="@+id/privacy"
                 android:icon="@drawable/ic_guide_icon"
-                android:title="@string/User_Guide" />
+                android:title="@string/privacy" />
             <item
                 android:id="@+id/ADD_Medical_Rep"
                 android:icon="@drawable/ic_baseline_account_box_24"
                 android:title="@string/ADD_Medical_Rep" />
-            <item
-                android:id="@+id/Delete_Medical_Rep"
-                android:icon="@drawable/ic_baseline_delete_forever_24"
-                android:title="@string/Delete_Medical_Rep" />
             <item
                 android:id="@+id/logout"
                 android:icon="@drawable/ic_logout_icon"

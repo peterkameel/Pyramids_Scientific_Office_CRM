@@ -41,9 +41,9 @@
     <item android:title="@string/Setting">
         <menu>
             <item
-                android:id="@+id/User_Guide"
+                android:id="@+id/privacy"
                 android:icon="@drawable/ic_guide_icon"
-                android:title="@string/User_Guide" />
+                android:title="@string/privacy" />
             <item
                 android:id="@+id/logout"
                 android:icon="@drawable/ic_logout_icon"

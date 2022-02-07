@@ -5,23 +5,28 @@ import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
-import com.peter_kameel.pyramidsscientificofficecrm.helper.CheckLocation
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckLocation
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewDoctorViewModel: ViewModel(){
-
+@HiltViewModel
+class NewDoctorViewModel
+@Inject constructor(
+    private var firebaseDBRepo: FirebaseDBRepo,
+    private val checkLocation: CheckLocation
+    ) : ViewModel() {
     val doctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>() }
     val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>() }
     val locationLiveData: MutableLiveData<Location> by lazy { MutableLiveData<Location>() }
     val massageLiveData: MutableLiveData<String> by lazy { MutableLiveData<String>() }
-
     fun getAreaList() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getAreaList(onSuccess = {
+            firebaseDBRepo.getAreaList(onSuccess = {
                 areaLiveData.postValue(it)
             }, onError = {
 
@@ -31,7 +36,7 @@ class NewDoctorViewModel: ViewModel(){
 
     fun getDoctorList() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getDoctorList(
+            firebaseDBRepo.getDoctorList(
                 onSuccess = {
                     doctorLiveData.postValue(it)
                 },
@@ -44,7 +49,7 @@ class NewDoctorViewModel: ViewModel(){
 
     fun saveNewDoctor(doctor: DoctorModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.addNewDoctor(doctor, onSuccess = {
+            firebaseDBRepo.addNewDoctor(doctor, onSuccess = {
                 massageLiveData.postValue(it)
             }, onError = {
                 massageLiveData.postValue(it)
@@ -54,7 +59,7 @@ class NewDoctorViewModel: ViewModel(){
 
     fun getLocation(ctx: Context){
         CoroutineScope(Dispatchers.Main).launch {
-            CheckLocation.getCurrent1location(ctx, onSuccess = {
+            checkLocation.getCurrentLocation(ctx, onSuccess = {
                 locationLiveData.postValue(it)
             }, onError = {
                 massageLiveData.postValue(it)

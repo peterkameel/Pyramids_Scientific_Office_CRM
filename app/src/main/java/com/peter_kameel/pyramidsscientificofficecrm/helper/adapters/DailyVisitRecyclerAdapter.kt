@@ -1,32 +1,52 @@
 package com.peter_kameel.pyramidsscientificofficecrm.helper.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.ItemDoctorNameRecyclerBinding
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
-import kotlinx.android.synthetic.main.item_doctor_name_recycler.view.*
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.sheets.BottomSheet
 
-class DailyVisitRecyclerAdapter (private var list: ArrayList<DailyVisitModel>)
+class DailyVisitRecyclerAdapter (
+    private val ctx: Context,
+    private var list: ArrayList<DailyVisitModel>,
+    private val activity: AppCompatActivity?)
     : RecyclerView.Adapter<DailyVisitRecyclerAdapter.ViewHolder>() {
 
-    class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
-        val name = item.item_doctor_name_in_recycler!!
-        val specialization = item.item_doctor_Specialization_in_recycler!!
+    class ViewHolder(val itemBinding: ItemDoctorNameRecyclerBinding): RecyclerView.ViewHolder(itemBinding.root) {
+        fun bind(visit: DailyVisitModel){
+            if (visit.time == "AM"){
+                itemBinding.itemDoctorNameInRecycler.text = visit.hospital!!.name
+            }else if (visit.time == "PM"){
+                itemBinding.itemDoctorNameInRecycler.text = visit.doctor!!.name
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_doctor_name_recycler, parent, false))
+        val binding = ItemDoctorNameRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
-        if (item.time == "AM"){
-            holder.name.text = item.hospital!!.name
-        }else if (item.time == "PM"){
-            holder.name.text = item.doctor!!.name
-            holder.specialization.text = item.doctor!!.specialization
+        holder.bind(item)
+        holder.itemBinding.itemDetails.setOnClickListener {
+            if (activity != null){
+                if (item.hospital != null) {
+                    BottomSheet(ctx, item.hospital, null).show(
+                        activity.supportFragmentManager,
+                        "tag"
+                    )
+                }else if (item.doctor != null){
+                    BottomSheet(ctx, null, item.doctor).show(
+                        activity.supportFragmentManager,
+                        "tag"
+                    )
+                }
+            }
         }
     }
 

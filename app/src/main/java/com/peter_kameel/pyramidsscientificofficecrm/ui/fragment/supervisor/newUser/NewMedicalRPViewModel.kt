@@ -5,11 +5,15 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewMedicalRPViewModel: ViewModel() {
+@HiltViewModel
+class NewMedicalRPViewModel
+@Inject constructor(private var firebaseDBRepo: FirebaseDBRepo): ViewModel() {
 
     //ADD Account
     private val auth = FirebaseAuth.getInstance()
@@ -18,9 +22,9 @@ class NewMedicalRPViewModel: ViewModel() {
 
     fun saveMedicalRPData(name:String, uid:String){
         val currentUid = auth.currentUser?.uid
-        val medical = LoginModel(name,currentUid,uid,"mr")
+        val medical = LoginModel(name,currentUid, uid,"mr")
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.addMedicalRep(
+            firebaseDBRepo.addMedicalRep(
                 currentUid.toString(),
                 medical,
                 onSuccess = {

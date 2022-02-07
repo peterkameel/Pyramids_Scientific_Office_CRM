@@ -4,53 +4,66 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.SupListOfHDBinding
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.DoctorRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.HospitalRecyclerAdapter
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.LoginModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
-import kotlinx.android.synthetic.main.sup_list_of_h_d.view.*
-import java.text.SimpleDateFormat
-import java.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MedicalRPList(
     private val item: LoginModel,
     private var type: String
 ) : Fragment() {
     private val viewModel by viewModels<MedicalRPListViewModel>()
+    private var _binding: SupListOfHDBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.sup_list_of_h_d, container, false)
+        _binding = SupListOfHDBinding.inflate(inflater, container, false)
+        val view = binding.root
         // RecycleView set LayoutManager
-        view.H_D_RecyclerView.setHasFixedSize(true)
+        binding.HDRecyclerView.setHasFixedSize(true)
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
-        view.H_D_RecyclerView.layoutManager = manager
+        binding.HDRecyclerView.layoutManager = manager
 
         when (type) {
             Massages.typeDoctor -> {
-                view.medical_name_button.text = "${item.user_name} Doctor`s List"
+                binding.medicalNameButton.text = "${item.user_name} Doctor`s List"
                 viewModel.getListOfDoctors(item.id.toString())
             }
             Massages.typeHospital -> {
-                view.medical_name_button.text = "${item.user_name} Hospital`s List"
+                binding.medicalNameButton.text = "${item.user_name} Hospital`s List"
                 viewModel.getListOfHospitals(item.id.toString())
             }
         }
         viewModel.doctorLiveData.observeForever {
-            view.H_D_RecyclerView.adapter = DoctorRecyclerAdapter(it,context!!)
+            binding.HDRecyclerView.adapter = DoctorRecyclerAdapter(it,requireContext(), activity as? AppCompatActivity)
         }
 
         viewModel.hospitalLiveData.observeForever {
-            view.H_D_RecyclerView.adapter = HospitalRecyclerAdapter(it,context!!)
+            binding.HDRecyclerView.adapter = HospitalRecyclerAdapter(it,requireContext(), activity as? AppCompatActivity)
+        }
+
+        viewModel.massageLiveData.observeForever {
+
         }
         return view
     }
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

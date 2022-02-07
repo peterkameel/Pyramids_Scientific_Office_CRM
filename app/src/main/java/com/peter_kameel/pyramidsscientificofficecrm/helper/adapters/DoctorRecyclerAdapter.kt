@@ -2,35 +2,35 @@ package com.peter_kameel.pyramidsscientificofficecrm.helper.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
-import com.peter_kameel.pyramidsscientificofficecrm.ui.activity.MainActivity
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.BottomSheet
-import kotlinx.android.synthetic.main.item_doctor_name_recycler.view.*
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.sheets.BottomSheet
+import androidx.appcompat.app.AppCompatActivity
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.ItemDoctorNameRecyclerBinding
 
-class DoctorRecyclerAdapter(private var list: ArrayList<DoctorModel>,private val ctx: Context)
+class DoctorRecyclerAdapter(
+    private var list: ArrayList<DoctorModel>,
+    private val ctx: Context,
+    private val activity: AppCompatActivity?
+    )
 : RecyclerView.Adapter<DoctorRecyclerAdapter.ViewHolder>() {
 
-    class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
-        val layoutItem = item.item_layout!!
-        val name = item.item_doctor_name_in_recycler!!
-        val specialization = item.item_doctor_Specialization_in_recycler!!
-        val activity = item.context as MainActivity
-    }
+    class ViewHolder(val itemBinding: ItemDoctorNameRecyclerBinding)
+        : RecyclerView.ViewHolder(itemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_doctor_name_recycler,parent,false))
+        val binding = ItemDoctorNameRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.name.text = list[position].name.toString()
-        holder.specialization.text = list[position].specialization.toString()
-
-        holder.layoutItem.setOnClickListener {
-            BottomSheet(ctx,null,list[position]).show(holder.activity.supportFragmentManager,"tag")
+        val item = list[position]
+        holder.itemBinding.itemDoctorNameInRecycler.text = item.name
+        holder.itemBinding.itemDetails.setOnClickListener {
+            if (activity !=null){
+                BottomSheet(ctx,null,list[position]).show(activity.supportFragmentManager,"tag")
+            }
         }
     }
 

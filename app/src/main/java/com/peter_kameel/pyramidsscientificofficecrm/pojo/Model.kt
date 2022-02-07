@@ -33,6 +33,7 @@ data class LoginModel(
 )
 
 data class WeeklyPlanModel(
+    var date: String? = "",
     var AM: ArrayList<HospitalModel>? = null,
     var PM: ArrayList<DoctorModel>? = null
 )

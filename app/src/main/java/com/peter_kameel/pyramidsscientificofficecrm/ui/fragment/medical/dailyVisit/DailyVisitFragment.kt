@@ -6,36 +6,45 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.DailyVisitBinding
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckNetwork
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.DateConvert
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
-import kotlinx.android.synthetic.main.daily_visit.view.*
-import kotlinx.android.synthetic.main.daily_visit.view.Daily_Visit_Hospital_TextInputLayout
-import kotlinx.android.synthetic.main.daily_visit.view.Location_Visit_Button
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DailyVisitFragment : Fragment() {
+    private var _binding: DailyVisitBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
     private val viewModel by viewModels<DailyVisitViewModel>()
     private var visitDate: String? = null
     private var doctor = DoctorModel()
     private var hospital = HospitalModel()
-
+    @Inject
+    lateinit var checkNetwork: CheckNetwork
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.daily_visit, container, false)
+        _binding = DailyVisitBinding.inflate(inflater, container, false)
+        val view = binding.root
         //show date picker
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
@@ -44,28 +53,29 @@ class DailyVisitFragment : Fragment() {
                 .build()
         //on chose date
         datePicker.addOnPositiveButtonClickListener {
-            visitDate = convertLongToTime(view, it)
+            visitDate = DateConvert.convertDateToText(it)
+            binding.WeeklyPlanDateButton.text = visitDate
         }
         //get date of visit
-        view.WeeklyPlan_Date_Button.setOnClickListener {
+        binding.WeeklyPlanDateButton.setOnClickListener {
             datePicker.show(parentFragmentManager, "tag")
         }
         val am = arrayOf("AM", "PM")
         val adapter =
             ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, am)
-        view.daily_visit_AM.setAdapter(adapter)
+        binding.dailyVisitAM.setAdapter(adapter)
         //on choose AM or PM
-        view.daily_visit_AM.doAfterTextChanged {
+        binding.dailyVisitAM.doAfterTextChanged {
             if (it.toString() == "AM") {
                 viewModel.getHospitalList()
-                view.Daily_Visit_Hospital_TextInputLayout.isEnabled = true
-                view.Daily_visit_Area_TextInputLayout.isEnabled = false
-                view.Daily_Visit_Doctor_TextInputLayout.isEnabled = false
+                binding.DailyVisitHospitalTextInputLayout.isEnabled = true
+                binding.DailyVisitAreaTextInputLayout.isEnabled = false
+                binding.DailyVisitDoctorTextInputLayout.isEnabled = false
             } else if (it.toString() == "PM") {
                 viewModel.getAreaList()
-                view.Daily_Visit_Hospital_TextInputLayout.isEnabled = false
-                view.Daily_visit_Area_TextInputLayout.isEnabled = true
-                view.Daily_Visit_Doctor_TextInputLayout.isEnabled = true
+                binding.DailyVisitHospitalTextInputLayout.isEnabled = false
+                binding.DailyVisitAreaTextInputLayout.isEnabled = true
+                binding.DailyVisitDoctorTextInputLayout.isEnabled = true
             }
         }
         //show the list of hospitals
@@ -77,7 +87,7 @@ class DailyVisitFragment : Fragment() {
             //set area down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, hospitalList)
-            view.daily_visit_hospital.setAdapter(arrayAdapter)
+            binding.dailyVisitHospital.setAdapter(arrayAdapter)
         }
         //show the list of area
         viewModel.areaLiveData.observeForever {
@@ -88,22 +98,26 @@ class DailyVisitFragment : Fragment() {
             //set area down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, arealList)
-            view.daily_visit_area.setAdapter(arrayAdapter)
+            binding.dailyVisitArea.setAdapter(arrayAdapter)
         }
         //on choose hospital get it`s data
-        view.daily_visit_hospital.doAfterTextChanged {
+        binding.dailyVisitHospital.doAfterTextChanged {
             viewModel.getSingleHospital(it.toString())
         }
         //on choose hospital get it`s data
         viewModel.singleHospitalLiveData.observeForever {
-            hospital = it[0]
-           //calculate the distance between current location and hospital location
+            hospital = it
+            //calculate the distance between current location and hospital location
             CoroutineScope(Dispatchers.IO).launch {
-                viewModel.checkDistance(context!!,hospital.latitude!!.toDouble(),hospital.longitude!!.toDouble())
+                viewModel.checkDistance(
+                    requireContext(),
+                    hospital.latitude!!.toDouble(),
+                    hospital.longitude!!.toDouble()
+                )
             }
         }
         //on choose area will appear call a list of doctors
-        view.daily_visit_area.doAfterTextChanged {
+        binding.dailyVisitArea.doAfterTextChanged {
             viewModel.getDoctorListByArea(it.toString())
         }
         //show the list of doctors
@@ -112,63 +126,67 @@ class DailyVisitFragment : Fragment() {
             for (item in it) {
                 doctorList.add(item.name.toString())
             }
-            //set area down list
+            //set doctor down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, doctorList)
-            view.daily_visit_doctor.setAdapter(arrayAdapter)
+            binding.dailyVisitDoctor.setAdapter(arrayAdapter)
         }
         //on choose doctor get it`s data
-        view.daily_visit_doctor.doAfterTextChanged {
+        binding.dailyVisitDoctor.doAfterTextChanged {
             viewModel.getSingleDoctor(it.toString())
         }
         //on choose doctor get it`s data
         viewModel.singleDoctorLiveData.observeForever {
-            doctor = it[0]
+            doctor = it
             //calculate the distance between current location and doctor location
             CoroutineScope(Dispatchers.IO).launch {
                 CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.checkDistance(context!!,doctor.latitude!!.toDouble(),doctor.longitude!!.toDouble())
+                    viewModel.checkDistance(
+                        requireContext(),
+                        doctor.latitude!!.toDouble(),
+                        doctor.longitude!!.toDouble()
+                    )
                 }
             }
         }
         //create the visit
-        view.daily_visit_create_button.setOnClickListener {
+        binding.dailyVisitCreateButton.setOnClickListener {
             when {
                 visitDate.isNullOrEmpty() -> {
-                    Toast.makeText(context,Massages.date,Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, Massages.date, Toast.LENGTH_LONG).show()
                 }
-                view.daily_visit_AM.text.isNullOrEmpty() -> {
-                    Toast.makeText(context,Massages.time,Toast.LENGTH_LONG).show()
+                binding.dailyVisitAM.text.isNullOrEmpty() -> {
+                    Toast.makeText(context, Massages.time, Toast.LENGTH_LONG).show()
                 }
                 else -> {
-                    if (view.daily_visit_AM.text.toString() == "AM") {
-                        if (view.daily_visit_hospital.text.isNullOrEmpty()) {
-                            Toast.makeText(context,Massages.hospital,Toast.LENGTH_LONG).show()
+                    if (binding.dailyVisitAM.text.toString() == "AM") {
+                        if (binding.dailyVisitHospital.text.isNullOrEmpty()) {
+                            Toast.makeText(context, Massages.hospital, Toast.LENGTH_LONG).show()
                         } else {
                             val visit = DailyVisitModel(
                                 visitDate,
-                                view.daily_visit_AM.text.toString(),
+                                binding.dailyVisitAM.text.toString(),
                                 hospital,
                                 null, null,
-                                view.daily_visit_comment.text.toString()
+                                binding.dailyVisitComment.text.toString()
                             )
                             viewModel.saveNewVisit(visit)
-                            clearView(view)
+                            clearView()
                         }
-                    } else if (view.daily_visit_AM.text.toString() == "PM") {
-                        if (view.daily_visit_area.text.isNullOrEmpty() or view.daily_visit_doctor.text.isNullOrEmpty()) {
-                            Toast.makeText(context,Massages.doctor,Toast.LENGTH_LONG).show()
+                    } else if (binding.dailyVisitAM.text.toString() == "PM") {
+                        if (binding.dailyVisitArea.text.isNullOrEmpty() or binding.dailyVisitDoctor.text.isNullOrEmpty()) {
+                            Toast.makeText(context, Massages.doctor, Toast.LENGTH_LONG).show()
                         } else {
                             val visit = DailyVisitModel(
                                 visitDate,
-                                view.daily_visit_AM.text.toString(),
+                                binding.dailyVisitAM.text.toString(),
                                 null,
-                                view.daily_visit_area.text.toString(),
+                                binding.dailyVisitArea.text.toString(),
                                 doctor,
-                                view.daily_visit_comment.text.toString()
+                                binding.dailyVisitComment.text.toString()
                             )
                             viewModel.saveNewVisit(visit)
-                            clearView(view)
+                            clearView()
                         }
                     } else {
                         Toast.makeText(context,Massages.time,Toast.LENGTH_LONG).show()
@@ -179,33 +197,51 @@ class DailyVisitFragment : Fragment() {
 
         //return distance
         viewModel.distanceLiveData.observeForever {
-            if (it <= 200) {
-                view.daily_visit_create_button.isEnabled = true
-                view.Location_Visit_Button.text = Massages.DistanceOk
-                view.daily_visit_create_button.isEnabled = true
-            } else {
-                view.Location_Visit_Button.text = Massages.DistanceNotOk
-                view.daily_visit_create_button.isEnabled = false
+            if (checkNetwork.isNetworkAvailable()){
+                if (it <= 200) {
+                    binding.dailyVisitCreateButton.isEnabled = true
+                    binding.LocationVisitButton.text = Massages.DistanceOk
+                    binding.dailyVisitCreateButton.isEnabled = true
+                } else {
+                    binding.LocationVisitButton.text = Massages.DistanceNotOk
+                    binding.dailyVisitCreateButton.isEnabled = false
+                }
+            }else {
+                if (it <= 500) {
+                    binding.dailyVisitCreateButton.isEnabled = true
+                    binding.LocationVisitButton.text = Massages.DistanceOk
+                    binding.dailyVisitCreateButton.isEnabled = true
+                } else {
+                    binding.LocationVisitButton.text = Massages.DistanceNotOk
+                    binding.dailyVisitCreateButton.isEnabled = false
+                }
             }
         }
 
         //if gps not enabled show the massage
         viewModel.massageLiveData.observeForever {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            if (this.requireView().isVisible) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            }
         }
 
         return view
     }
 
-    private fun convertLongToTime(view: View, time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-        val dateString = format.format(date)
-        view.WeeklyPlan_Date_Button.text = dateString
-        return dateString
+    private fun clearView() {
+        binding.dailyVisitCreateButton.isEnabled = false
+        if (!binding.dailyVisitComment.text.isNullOrEmpty()) {
+            binding.dailyVisitComment.text!!.clear()
+        }
+        if (!binding.dailyVisitHospital.text.isNullOrEmpty()) {
+            binding.dailyVisitHospital.text!!.clear()
+        } else if (!binding.dailyVisitDoctor.text.isNullOrEmpty()) {
+            binding.dailyVisitDoctor.text!!.clear()
+        }
     }
 
-    private fun clearView(view: View) {
-        view.daily_visit_create_button.isEnabled = false
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

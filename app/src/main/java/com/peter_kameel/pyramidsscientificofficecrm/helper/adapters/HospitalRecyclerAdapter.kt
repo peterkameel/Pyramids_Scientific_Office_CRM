@@ -1,49 +1,38 @@
 package com.peter_kameel.pyramidsscientificofficecrm.helper.adapters
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.peter_kameel.pyramidsscientificofficecrm.R
-import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.BottomSheet
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.ItemDoctorNameRecyclerBinding
+import com.peter_kameel.pyramidsscientificofficecrm.ui.fragment.sheets.BottomSheet
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
-import com.peter_kameel.pyramidsscientificofficecrm.ui.activity.MainActivity
-import kotlinx.android.synthetic.main.item_doctor_name_recycler.view.*
 
-class HospitalRecyclerAdapter(private var list: ArrayList<HospitalModel>,private val ctx: Context)
+class HospitalRecyclerAdapter(
+    private var list: ArrayList<HospitalModel>,
+    private val ctx: Context,
+    private val activity: AppCompatActivity?
+    )
     : RecyclerView.Adapter<HospitalRecyclerAdapter.ViewHolder>() {
-    //private val sheet : BottomSheet = BottomSheet()
-    class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
-        val layoutItem = item.item_layout!!
-        val name = item.item_doctor_name_in_recycler!!
-        val activity = item.context as MainActivity
-    }
+
+    class ViewHolder(val itemBinding: ItemDoctorNameRecyclerBinding): RecyclerView.ViewHolder(itemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_doctor_name_recycler, parent, false)
-        )
+        val binding = ItemDoctorNameRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
-        holder.name.text = item.name
+        holder.itemBinding.itemDoctorNameInRecycler.text = item.name
 
-        holder.layoutItem.setOnClickListener {
-            BottomSheet(ctx,item,null).show(holder.activity.supportFragmentManager,"tag")
+        holder.itemBinding.itemDetails.setOnClickListener {
+            if (activity != null){
+                BottomSheet(ctx,item,null).show(activity.supportFragmentManager,"tag")
+            }
         }
-
     }
 
     override fun getItemCount() = list.size
-
-    private fun intentLocation(lat: String, lon: String){
-        // Creates an Intent that will load a map of San Francisco
-        val gmmIntentUri = Uri.parse("geo:0,0?q=$lat,$lon")
-        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-        mapIntent.setPackage("com.google.android.apps.maps")
-        ctx.startActivity(mapIntent)
-    }
 }

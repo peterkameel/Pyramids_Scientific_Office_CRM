@@ -39,4 +39,8 @@ object Massages {
     //Main Fragment
     const val visitsDate: String = "Visit`s of Date:  "
     const val planDate: String = "Plan of Date:  "
+
+    //Select Date
+    const val PlanType: String = "PlanType"
+    const val visitsType: String = "visitsType"
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pyramids Scientific Office CRM</string>
+    <string name="app_name">PSO CRM</string>
     <!--Navigation Menu-->
     <string name="main">Main</string>
     <string name="dashboard">Dashboard</string>
@@ -70,5 +70,13 @@
     <string name="imageButton">Image Button</string>
     <string name="intentLocation">Open Location On Maps</string>
     <string name="deleteItem">Delete Item</string>
+    <string name="SelectDate">Select Date</string>
+    <string name="SelectSecondDate">Select End Date</string>
+    <string name="create">Create</string>
+    <string name="dataExport">Data Export</string>
+    <string name="auto">Auto Generate</string>
+    <string name="ExportPlan">Export Plan File</string>
+    <string name="VisitFile">Export Visit File</string>
+    <string name="privacy">Privacy Policy</string>
 
 </resources>

@@ -13,37 +13,42 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.peter_kameel.pyramidsscientificofficecrm.R
 import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
-import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.ActivityLoginBinding
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckNetwork
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
-import kotlinx.android.synthetic.main.activity_login.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-    //Check internet connection and save it in boolean value
-    private val checkConnection: Boolean by lazy {
-        InternetConnection(
-            this
-        ).isConnectToInternet
-    }
+    private lateinit var binding: ActivityLoginBinding
+    @Inject
+    lateinit var shared: Shared
+    @Inject
+    lateinit var firebaseDBRepo: FirebaseDBRepo
+    @Inject
+    lateinit var checkNetwork: CheckNetwork
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         //Mack a timer for SplashScreen
         object : CountDownTimer(1000, 1000) {
             override fun onFinish() {
-                appName.visibility = View.GONE
-                loadingProgressBar.visibility = View.GONE
-                rootView.setBackgroundColor(
+                binding.appName.visibility = View.GONE
+                binding.loadingProgressBar.visibility = View.GONE
+                binding.rootView.setBackgroundColor(
                     ContextCompat.getColor(
                         this@LoginActivity,
                         R.color.white
                     )
                 )
-                bookIconImageView.setImageResource(R.drawable.ic_lancher)
+                binding.bookIconImageView.setImageResource(R.drawable.ic_logo)
                 startAnimation()
             }
 
@@ -54,28 +59,28 @@ class LoginActivity : AppCompatActivity() {
         checker()
 
         //on button login clicked
-        loginButton.setOnClickListener {
+        binding.loginButton.setOnClickListener {
             //check if username field is empty
             when {
-                email.text!!.isEmpty() -> email.error = "Enter Email"
+                binding.email.text!!.isEmpty() -> binding.email.error = "Enter Email"
                 //check if password field is empty
-                password.text!!.isEmpty() -> password.error = "Enter Password"
+                binding.password.text!!.isEmpty() -> binding.password.error = "Enter Password"
                 //if connection
-                checkConnection -> login(email.text.toString(), password.text.toString())
+                checkNetwork.isNetworkAvailable() -> login(binding.email.text.toString(), binding.password.text.toString())
                 //if no connection
                 else -> Toast.makeText(this, "Check Internet Connection", Toast.LENGTH_LONG).show()
             }//End When
         }//End OnClickListener
 
         //on Button Reset Password Clicked
-        forgetPass.setOnClickListener {
+        binding.forgetPass.setOnClickListener {
             //Check internet connection using Interconnection::Class and save it in boolean value
-            val check: Boolean = InternetConnection(this).isConnectToInternet
+            val check: Boolean = CheckNetwork(this).isNetworkAvailable()
             when {
                 //check if email is empty
-                email.text!!.isEmpty() -> email.error = "Enter Your Email!"
+                binding.email.text!!.isEmpty() -> binding.email.error = "Enter Your Email!"
                 //if connection
-                check -> reset(email.text.toString())
+                check -> reset(binding.email.text.toString())
                 //if no connection
                 else -> Toast.makeText(this, Massages.connection, Toast.LENGTH_LONG).show()
             }//End When
@@ -86,7 +91,7 @@ class LoginActivity : AppCompatActivity() {
         super.onStart()
         if (ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
             ) !=
             PackageManager.PERMISSION_GRANTED
         ) {
@@ -100,14 +105,14 @@ class LoginActivity : AppCompatActivity() {
 
     //Start Animation to show content
     private fun startAnimation() {
-        bookIconImageView.animate().apply {
+        binding.bookIconImageView.animate().apply {
             x(50f)
             y(100f)
             duration = 1000
         }.setListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(p0: Animator?) {}
             override fun onAnimationEnd(p0: Animator?) {
-                afterAnimationView.visibility = View.VISIBLE
+                binding.afterAnimationView.visibility = View.VISIBLE
             }
 
             override fun onAnimationCancel(p0: Animator?) {}
@@ -118,10 +123,7 @@ class LoginActivity : AppCompatActivity() {
     //Skip Login Activity If User Save Login Data By Remember me CheckBox
     private fun checker() {
         val check = java.lang.Boolean.valueOf(
-            Shared.readSharedBoolean(
-                this,
-                SharedTag.User_Found, false
-            )
+            shared.readSharedBoolean(SharedTag.User_Found,false)
         )
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(SharedTag.User_Found, check)
@@ -135,15 +137,14 @@ class LoginActivity : AppCompatActivity() {
     //Login Request
     private fun login(email: String, password: String) {
         //show the Login progress bar
-        LoginProgressBar.visibility = View.VISIBLE
+        binding.LoginProgressBar.visibility = View.VISIBLE
         //Sign In
         val auth = FirebaseAuth.getInstance()
         //Firebase SignIn With Email And Password
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                if (checkbox.isChecked) {
-                    Shared.saveSharedBoolean(
-                        applicationContext,
+                if (binding.checkbox.isChecked) {
+                    shared.saveSharedBoolean(
                         SharedTag.User_Found,
                         true
                     ) //use this line to skip the activity
@@ -152,7 +153,7 @@ class LoginActivity : AppCompatActivity() {
 
             } else {
                 //Remove LoginProgressBar
-                LoginProgressBar.visibility = View.GONE
+                binding.LoginProgressBar.visibility = View.GONE
                 Toast.makeText(this, "Error Check Username and Password", Toast.LENGTH_LONG).show()
             }//else
         }//End addOnCompleteListener
@@ -175,21 +176,22 @@ class LoginActivity : AppCompatActivity() {
 
     private fun saveLoginData(id: String) {
         CoroutineScope(Dispatchers.Main).launch {
-            FirebaseDBRepo.getUserData(
+            firebaseDBRepo.getUserData(
                 id,
                 onSuccess = {
-                    Shared.saveSharedString(
-                        applicationContext,
+                    shared.saveSharedString(
+                        SharedTag.UID,
+                        it.id.toString()
+                    )
+                    shared.saveSharedString(
                         SharedTag.user_name,
                         it.user_name.toString()
                     )
-                    Shared.saveSharedString(
-                        applicationContext,
+                    shared.saveSharedString(
                         SharedTag.supervisor_ID,
                         it.supervisor_ID.toString()
                     )
-                    Shared.saveSharedString(
-                        applicationContext,
+                    shared.saveSharedString(
                         SharedTag.permission,
                         it.permission.toString()
                     )

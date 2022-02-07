@@ -7,5 +7,7 @@ object SharedTag {
     const val user_name: String = "user_name"
     const val permission: String = "permission"
     const val MainFragmentTAG: String = "MainFragment"
+    const val superFragmentTAG: String = "SupFragment"
     const val FragmentTAG: String = "frag"
+    const val AutoGenerate: String =  "Auto"
 }

@@ -8,55 +8,57 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseAuth
-import com.peter_kameel.pyramidsscientificofficecrm.R
-import com.peter_kameel.pyramidsscientificofficecrm.helper.InterConn.InternetConnection
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.CreateNewUserBinding
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.CheckNetwork
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
 import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
 import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
-import kotlinx.android.synthetic.main.create_new_user.view.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NewMedicalRP : Fragment() {
     private val viewModel by viewModels<NewMedicalRPViewModel>()
     private var userID: String? = null
-
+    private var _binding: CreateNewUserBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
     //ADD Account
     private val auth = FirebaseAuth.getInstance()
-
-    //Check internet connection and save it in boolean value
-    private val checkConnection: Boolean by lazy {
-        InternetConnection(
-            context
-        ).isConnectToInternet
-    }
-
+    @Inject
+    lateinit var shared: Shared
+    @Inject
+    lateinit var checkNetwork: CheckNetwork
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.create_new_user, container, false)
-        val uid = Shared.readSharedString(context!!, SharedTag.UID, "false").toString()
+        _binding = CreateNewUserBinding.inflate(inflater, container, false)
+        val view = binding.root
+        val uid = shared.readSharedString(SharedTag.UID, "null").toString()
         userID = uid
         //create new user
-        view.Create_New_User_Button.setOnClickListener {
+        binding.CreateNewUserButton.setOnClickListener {
             when {
-                view.New_User_Name_TextFiled.text.isNullOrEmpty() -> {
+                binding.NewUserNameTextFiled.text.isNullOrEmpty() -> {
                     Toast.makeText(context, Massages.medicalName, Toast.LENGTH_LONG).show()
                 }
-                view.New_User_Password_TextFiled.text.isNullOrEmpty() -> {
+                binding.NewUserPasswordTextFiled.text.isNullOrEmpty() -> {
                     Toast.makeText(context, Massages.medicalPassword, Toast.LENGTH_LONG).show()
                 }
-                view.New_User_Email_TextFiled.text.isNullOrEmpty() -> {
+                binding.NewUserEmailTextFiled.text.isNullOrEmpty() -> {
                     Toast.makeText(context, Massages.medicalEmail, Toast.LENGTH_LONG).show()
                 }
-                !checkConnection -> {
+                !checkNetwork.isNetworkAvailable() -> {
                     Toast.makeText(context, Massages.connection, Toast.LENGTH_LONG).show()
                 }
                 else -> {
                     createNewMedicalRP(
-                        view.New_User_Email_TextFiled.text.toString(),
-                        view.New_User_Password_TextFiled.text.toString(),
-                        view.New_User_Name_TextFiled.text.toString()
+                        binding.NewUserEmailTextFiled.text.toString(),
+                        binding.NewUserPasswordTextFiled.text.toString(),
+                        binding.NewUserNameTextFiled.text.toString()
                     )
                 }
             }
@@ -64,7 +66,7 @@ class NewMedicalRP : Fragment() {
         //on user add successfully
         viewModel.massageLiveData.observeForever {
             if (it == Massages.successful){
-                clearView(view)
+                clearView()
             }
         }
         return view
@@ -74,17 +76,22 @@ class NewMedicalRP : Fragment() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    viewModel.saveMedicalRPData(name, userID.toString())
+                    viewModel.saveMedicalRPData(name,userID.toString())
                 } else {
                     Toast.makeText(context, Massages.error, Toast.LENGTH_LONG).show()
                 }
             }
     }
 
-    private fun clearView(view: View){
-        view.New_User_Name_TextFiled.text?.clear()
-        view.New_User_Password_TextFiled.text?.clear()
-        view.New_User_Email_TextFiled.text?.clear()
+    private fun clearView(){
+        binding.NewUserNameTextFiled.text?.clear()
+        binding.NewUserPasswordTextFiled.text?.clear()
+        binding.NewUserEmailTextFiled.text?.clear()
         Toast.makeText(context,Massages.successful,Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

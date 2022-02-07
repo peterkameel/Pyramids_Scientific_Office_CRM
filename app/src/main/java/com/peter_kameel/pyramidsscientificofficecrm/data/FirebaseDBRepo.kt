@@ -1,15 +1,27 @@
 package com.peter_kameel.pyramidsscientificofficecrm.data
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.*
 import com.google.firebase.ktx.Firebase
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.*
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
+import com.peter_kameel.pyramidsscientificofficecrm.util.Shared
+import com.peter_kameel.pyramidsscientificofficecrm.util.SharedTag
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object FirebaseDBRepo {
-
+@Singleton
+class FirebaseDBRepo
+@Inject constructor(
+    private val shared: Shared
+){
     private val db = Firebase.firestore
-    private val uid = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    private val uid: String by lazy {
+        shared.readSharedString(
+            SharedTag.UID,
+            FirebaseAuth.getInstance().currentUser!!.uid)
+            .toString()
+    }
 
     //General functions
     fun getAreaList(
@@ -311,11 +323,40 @@ object FirebaseDBRepo {
             .document(date)
             .get()
             .addOnSuccessListener {
+                var hospitalList = ArrayList<HospitalModel>()
+                var doctorList = ArrayList<DoctorModel>()
                 val list = it.toObject(WeeklyPlanModel::class.java)
-                onSuccess(list?.AM!!, list.PM!!)
+                if (list != null) {
+                    hospitalList = list.AM!!
+                    doctorList = list.PM!!
+                }
+                onSuccess(hospitalList, doctorList)
             }
             .addOnFailureListener {
                 onError(it.toString())
+            }
+    }
+
+    fun getWeeklyPlanByDateList(
+        dates: ArrayList<String>,
+        medicalRPID: String,
+        onSuccess: (ArrayList<WeeklyPlanModel>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        db.collection("Users")
+            .document(medicalRPID)
+            .collection("Plan")
+            .whereIn("date", dates)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    onError(error.toString())
+                    return@addSnapshotListener
+                }
+                val list = ArrayList<WeeklyPlanModel>()
+                for (doc in value!!) {
+                    doc.let { data -> list.add(data.toObject(WeeklyPlanModel::class.java)) }
+                }
+                onSuccess(list)
             }
     }
 
@@ -381,11 +422,12 @@ object FirebaseDBRepo {
 
     //SuperVisor Dashboard
     fun getListOfMedicalBySupID(
+        id: String,
         onSuccess: (ArrayList<LoginModel>) -> Unit,
         onError: (String) -> Unit
     ) {
         db.collection("Users")
-            .whereEqualTo("supervisor_ID", uid)
+            .whereEqualTo("supervisor_ID", id)
             .addSnapshotListener { it, e ->
                 if (e != null) {
                     onError(e.toString())

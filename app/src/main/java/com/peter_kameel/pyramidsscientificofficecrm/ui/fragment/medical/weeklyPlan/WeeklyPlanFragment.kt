@@ -6,26 +6,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.peter_kameel.pyramidsscientificofficecrm.R
+import com.peter_kameel.pyramidsscientificofficecrm.databinding.WeeklyPlanBinding
 import com.peter_kameel.pyramidsscientificofficecrm.helper.adapters.WeeklyPlanAdapterList
+import com.peter_kameel.pyramidsscientificofficecrm.helper.objects.DateConvert
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanRecyclerModel
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
-import kotlinx.android.synthetic.main.daily_visit.view.WeeklyPlan_Date_Button
-import kotlinx.android.synthetic.main.weekly_plan.view.*
-import java.text.SimpleDateFormat
-import java.util.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class WeeklyPlanFragment : Fragment() {
     private val viewModel by viewModels<WeeklyPlanViewModel>()
+    private var _binding: WeeklyPlanBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
     private var visitDate: String? = null
     private var hospitalList: ArrayList<HospitalModel> = ArrayList()
     private var doctorList: ArrayList<DoctorModel> = ArrayList()
@@ -36,12 +41,13 @@ class WeeklyPlanFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.weekly_plan, container, false)
+        _binding = WeeklyPlanBinding.inflate(inflater, container, false)
+        val view = binding.root
         // RecycleView set LayoutManager
-        view.WeeklyPlanRecyclerView.setHasFixedSize(true)
+        binding.WeeklyPlanRecyclerView.setHasFixedSize(true)
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
-        view.WeeklyPlanRecyclerView.layoutManager = manager
+        binding.WeeklyPlanRecyclerView.layoutManager = manager
         //get lists
         viewModel.getAreaList()
         viewModel.getHospitalList()
@@ -53,10 +59,11 @@ class WeeklyPlanFragment : Fragment() {
                 .build()
         //on chose date
         datePicker.addOnPositiveButtonClickListener {
-            visitDate = convertLongToTime(view, it)
+            visitDate = DateConvert.convertDateToText(it)
+            binding.WeeklyPlanDateButton.text = visitDate
         }
         //get date of visit
-        view.WeeklyPlan_Date_Button.setOnClickListener {
+        binding.WeeklyPlanDateButton.setOnClickListener {
             datePicker.show(parentFragmentManager, "tag")
         }
 
@@ -69,7 +76,7 @@ class WeeklyPlanFragment : Fragment() {
             //set area down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, hospitalList)
-            view.Weekly_Plan_Hospital_text.setAdapter(arrayAdapter)
+            binding.WeeklyPlanHospitalText.setAdapter(arrayAdapter)
         }
 
         //get the list of area
@@ -81,11 +88,11 @@ class WeeklyPlanFragment : Fragment() {
             //set area down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, arealList)
-            view.Weekly_Plan_Area_text.setAdapter(arrayAdapter)
+            binding.WeeklyPlanAreaText.setAdapter(arrayAdapter)
         }
 
         //on text changed get the doctor list
-        view.Weekly_Plan_Area_text.doAfterTextChanged {
+        binding.WeeklyPlanAreaText.doAfterTextChanged {
             viewModel.getDoctorListByArea(it.toString())
         }
         //set the list of doctor
@@ -97,45 +104,45 @@ class WeeklyPlanFragment : Fragment() {
             //set area down list
             val arrayAdapter =
                 ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, doctorList)
-            view.Weekly_Plan_doctor.setAdapter(arrayAdapter)
+            binding.WeeklyPlanDoctor.setAdapter(arrayAdapter)
         }
 
         //save hospital
-        view.Weekly_Plan_Save_Hospital.setOnClickListener {
-            if (view.Weekly_Plan_Hospital_text.text.isNullOrEmpty()) {
+        binding.WeeklyPlanSaveHospital.setOnClickListener {
+            if (binding.WeeklyPlanHospitalText.text.isNullOrEmpty()) {
                 Toast.makeText(context,Massages.hospital, Toast.LENGTH_LONG).show()
             } else {
-                viewModel.getSingleHospital(view.Weekly_Plan_Hospital_text.text.toString())
+                viewModel.getSingleHospital(binding.WeeklyPlanHospitalText.text.toString())
             }
         }
         viewModel.singleHospitalLiveData.observeForever {
             it?.let {
                 hospitalList.add(it[0])
                 adapterList.add(WeeklyPlanRecyclerModel(it[0].name.toString()))
-                view.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
-                view.Weekly_Plan_Hospital_text.text.clear()
+                binding.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
+                binding.WeeklyPlanHospitalText.text.clear()
             }
         }
 
         //save doctor
-        view.Weekly_Plan_Save_Doctor.setOnClickListener {
-            if (view.Weekly_Plan_doctor.text.isNullOrEmpty()) {
+        binding.WeeklyPlanSaveDoctor.setOnClickListener {
+            if (binding.WeeklyPlanDoctor.text.isNullOrEmpty()) {
                 Toast.makeText(context, Massages.doctor, Toast.LENGTH_LONG).show()
             } else {
-                viewModel.getSingleDoctor(view.Weekly_Plan_doctor.text.toString())
+                viewModel.getSingleDoctor(binding.WeeklyPlanDoctor.text.toString())
             }
         }
         viewModel.singleDoctorLiveData.observeForever {
             it?.let {
                 doctorList.add(it[0])
                 adapterList.add(WeeklyPlanRecyclerModel(it[0].name.toString()))
-                view.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
-                view.Weekly_Plan_doctor.text.clear()
+                binding.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
+                binding.WeeklyPlanDoctor.text.clear()
             }
         }
 
         //save the plan for the date and clear data
-        view.Weekly_Plan_Save_Plan_Date.setOnClickListener {
+        binding.WeeklyPlanSavePlanDate.setOnClickListener {
             when {
                 visitDate.isNullOrEmpty() -> {
                     Toast.makeText(context, Massages.date, Toast.LENGTH_LONG).show()
@@ -147,36 +154,43 @@ class WeeklyPlanFragment : Fragment() {
                     Toast.makeText(context, Massages.doctor, Toast.LENGTH_LONG).show()
                 }
                 else -> {
-                    val plan = WeeklyPlanModel(hospitalList, doctorList)
+                    val plan = WeeklyPlanModel(visitDate.toString(),hospitalList, doctorList)
                     viewModel.createPlan(visitDate.toString(), plan)
                     Toast.makeText(context, Massages.addPlan, Toast.LENGTH_LONG).show()
-                    clearView(view)
+                    clearView()
                 }
             }
         }
         viewModel.massageLiveData.observeForever {
-            Toast.makeText(context,it,Toast.LENGTH_LONG).show()
-        }
+            if (this.requireView().isVisible){
+                Toast.makeText(requireContext(),it,Toast.LENGTH_LONG).show()
+            }        }
         return view
     }
-
-    private fun convertLongToTime(view: View, time: Long): String {
+/**
+    private fun convertLongToTime(time: Long): String {
         val date = Date(time)
         val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val dateString = format.format(date)
-        view.WeeklyPlan_Date_Button.text = dateString
+        binding.WeeklyPlanDateButton.text = dateString
         return dateString
     }
+    **/
 
-    private fun clearView(view: View) {
-        view.WeeklyPlan_Date_Button.text = Massages.getDate
+    private fun clearView() {
+        binding.WeeklyPlanDateButton.text = Massages.getDate
         visitDate = null
         hospitalList.clear()
         doctorList.clear()
         adapterList.clear()
-        view.Weekly_Plan_Hospital_text.text?.clear()
-        view.Weekly_Plan_Area_text.text?.clear()
-        view.Weekly_Plan_doctor.text?.clear()
-        view.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
+        binding.WeeklyPlanHospitalText.text?.clear()
+        binding.WeeklyPlanAreaText.text?.clear()
+        binding.WeeklyPlanDoctor.text?.clear()
+        binding.WeeklyPlanRecyclerView.adapter = WeeklyPlanAdapterList(adapterList)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

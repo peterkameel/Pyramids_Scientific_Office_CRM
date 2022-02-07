@@ -1,4 +1,4 @@
-package com.peter_kameel.pyramidsscientificofficecrm.helper
+package com.peter_kameel.pyramidsscientificofficecrm.helper.objects
 
 import android.Manifest
 import android.app.Activity
@@ -11,11 +11,23 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.peter_kameel.pyramidsscientificofficecrm.util.Massages
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object CheckLocation {
+@Singleton
+class CheckLocation @Inject constructor(
+    private val checkNetwork: CheckNetwork
+) {
 
-    suspend fun getCurrent1location(ctx: Context,onSuccess: (Location) -> Unit, onError: (String) -> Unit) {
+    suspend fun getCurrentLocation(
+        ctx: Context,
+        onSuccess: (Location) -> Unit,
+        onError: (String) -> Unit
+    ) {
         var gpsEnabled = false
         //get location client
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(ctx)
@@ -39,15 +51,27 @@ object CheckLocation {
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    fusedLocationClient.getCurrentLocation(
-                        LocationRequest.PRIORITY_HIGH_ACCURACY,
-                        CancellationTokenSource().token
-                    )
-                        .addOnSuccessListener { location: Location? ->
-                            CoroutineScope(Dispatchers.Main).launch {
-                                location?.let { onSuccess(it) }
+                    if (checkNetwork.isNetworkAvailable()) {
+                        fusedLocationClient.getCurrentLocation(
+                            LocationRequest.PRIORITY_HIGH_ACCURACY,
+                            CancellationTokenSource().token
+                        )
+                            .addOnSuccessListener { location: Location? ->
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    location?.let { onSuccess(it) }
+                                }
                             }
-                        }
+                    } else {
+                        fusedLocationClient.getCurrentLocation(
+                            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
+                            CancellationTokenSource().token
+                        )
+                            .addOnSuccessListener { location: Location? ->
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    location?.let { onSuccess(it) }
+                                }
+                            }
+                    }
                 } else {
                     //Request The Permission
                     ActivityCompat.requestPermissions(
@@ -67,7 +91,7 @@ object CheckLocation {
         onSuccess: (Double) -> Unit,
         onError: (String) -> Unit){
         CoroutineScope(Dispatchers.Main).launch{
-            getCurrent1location(ctx,onSuccess = {
+            getCurrentLocation(ctx,onSuccess = {
                 val results = FloatArray(1)
                 Location.distanceBetween(lat, lon, it.latitude, it.longitude, results)
                 onSuccess(results[0].toDouble())

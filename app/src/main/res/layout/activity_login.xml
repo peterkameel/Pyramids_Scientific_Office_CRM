@@ -15,7 +15,7 @@
         android:layout_height="@dimen/_60sdp"
         android:layout_centerInParent="true"
         android:contentDescription="@null"
-        android:src="@drawable/ic_lancher" />
+        android:src="@drawable/ic_logo" />
     <!--App Name-->
     <TextView
         android:id="@+id/appName"
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/WelcomeTextView"
             android:layout_marginTop="10dp"
-            android:text="@string/app_name"
+            android:text="@string/login_AppName"
             android:textColor="@color/Dark_Green"
             android:textSize="@dimen/_10ssp" />
         <!--UserName&&Password-->
@@ -153,11 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
-            android:padding="12dp"
             android:textSize="@dimen/_16ssp" />
 
         <ProgressBar
@@ -166,7 +162,7 @@
             android:layout_width="match_parent"
             android:layout_height="12dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="-4dp"
+            android:layout_marginBottom="@dimen/_8sdp"
             android:foregroundGravity="bottom"
             android:indeterminate="true"
             android:visibility="gone"/>

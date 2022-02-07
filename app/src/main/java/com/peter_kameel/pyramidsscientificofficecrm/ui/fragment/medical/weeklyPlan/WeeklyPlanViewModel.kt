@@ -7,12 +7,15 @@ import com.peter_kameel.pyramidsscientificofficecrm.pojo.AreaModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.WeeklyPlanModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WeeklyPlanViewModel: ViewModel() {
-
+@HiltViewModel
+class WeeklyPlanViewModel
+@Inject constructor(private var firebaseDBRepo: FirebaseDBRepo) : ViewModel() {
     val hospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
     val areaLiveData: MutableLiveData<ArrayList<AreaModel>> by lazy { MutableLiveData<ArrayList<AreaModel>>() }
     val doctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>() }
@@ -22,7 +25,7 @@ class WeeklyPlanViewModel: ViewModel() {
 
     fun getHospitalList() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getHospitalList(
+            firebaseDBRepo.getHospitalList(
                 onSuccess = {
                     hospitalLiveData.postValue(it)
                 },
@@ -35,7 +38,7 @@ class WeeklyPlanViewModel: ViewModel() {
 
     fun getAreaList() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getAreaList(onSuccess = {
+            firebaseDBRepo.getAreaList(onSuccess = {
                 areaLiveData.postValue(it)
             }, onError = {
 
@@ -45,7 +48,7 @@ class WeeklyPlanViewModel: ViewModel() {
 
     fun getDoctorListByArea(area: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getDoctorListByArea(
+            firebaseDBRepo.getDoctorListByArea(
                 area,
                 onSuccess = {
                     doctorLiveData.postValue(it)
@@ -59,7 +62,7 @@ class WeeklyPlanViewModel: ViewModel() {
 
     fun getSingleDoctor(doctorName: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getSingleDoctor(
+            firebaseDBRepo.getSingleDoctor(
                 doctorName,
                 onSuccess = {
                     singleDoctorLiveData.postValue(it)
@@ -73,7 +76,7 @@ class WeeklyPlanViewModel: ViewModel() {
 
     fun getSingleHospital(hospitalName: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getSingleHospital(
+            firebaseDBRepo.getSingleHospital(
                 hospitalName,
                 onSuccess = {
                     singleHospitalLiveData.postValue(it)
@@ -85,9 +88,9 @@ class WeeklyPlanViewModel: ViewModel() {
         }
     }
 
-    fun createPlan(date: String ,plan: WeeklyPlanModel){
+    fun createPlan(date: String, plan: WeeklyPlanModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.createPlan(
+            firebaseDBRepo.createPlan(
                 date,
                 plan,
                 onSuccess = {
@@ -99,4 +102,5 @@ class WeeklyPlanViewModel: ViewModel() {
             )
         }
     }
+
 }

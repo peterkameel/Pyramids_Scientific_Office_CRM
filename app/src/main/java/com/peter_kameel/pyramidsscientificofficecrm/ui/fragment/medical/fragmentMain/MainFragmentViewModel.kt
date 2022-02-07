@@ -6,12 +6,16 @@ import com.peter_kameel.pyramidsscientificofficecrm.data.FirebaseDBRepo
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DailyVisitModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.DoctorModel
 import com.peter_kameel.pyramidsscientificofficecrm.pojo.HospitalModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainFragmentViewModel: ViewModel() {
-
+@HiltViewModel
+class MainFragmentViewModel
+    @Inject constructor(private var firebaseDBRepo: FirebaseDBRepo)
+    : ViewModel() {
     val visitLiveData: MutableLiveData<ArrayList<DailyVisitModel>> by lazy { MutableLiveData<ArrayList<DailyVisitModel>>() }
     val weeklyPlanHospitalLiveData: MutableLiveData<ArrayList<HospitalModel>> by lazy { MutableLiveData<ArrayList<HospitalModel>>() }
     val weeklyPlanDoctorLiveData: MutableLiveData<ArrayList<DoctorModel>> by lazy { MutableLiveData<ArrayList<DoctorModel>>() }
@@ -19,7 +23,7 @@ class MainFragmentViewModel: ViewModel() {
 
     fun getVisitListBYDate(date: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getVisitsList(
+            firebaseDBRepo.getVisitsList(
                 date,
                 onSuccess = {
                     visitLiveData.postValue(it)
@@ -33,7 +37,7 @@ class MainFragmentViewModel: ViewModel() {
 
     fun getVisitListBYDateAndID(date: String,mID: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getVisitListBYDateAndID(
+            firebaseDBRepo.getVisitListBYDateAndID(
                 date,
                 mID,
                 onSuccess = {
@@ -48,7 +52,7 @@ class MainFragmentViewModel: ViewModel() {
 
     fun getWeeklyPlanByDateAndID(date: String,mID: String){
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseDBRepo.getWeeklyPlanByDate(
+            firebaseDBRepo.getWeeklyPlanByDate(
                 date,
                 mID,
                 onSuccess = {hospitalList,doctorList->
